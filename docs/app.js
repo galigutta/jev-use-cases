@@ -38,7 +38,7 @@
 
   // Deep link
   const hash = location.hash.replace("#pillar-", "").replace("#", "");
-  const known = ["workflow", "bulk", "realtime", "verify", "harness"];
+  const known = ["workflow", "bulk", "realtime", "verify", "harness", "voice"];
   if (known.includes(hash)) openPillar(hash, { scroll: true });
 
   // Intersection: update rail as user scrolls open pillars

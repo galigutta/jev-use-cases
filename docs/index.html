@@ -4,15 +4,13 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Jev · MECE Use-Case Map</title>
-  <meta name="description" content="An inspired MECE map of TypeSafe Jev use cases from the first days on X — smart workflows, bulk judgment, real-time loops, verification, and agent harnesses." />
+  <meta name="description" content="MECE map of TypeSafe Jev use cases from X and the first demos — with links and handles. Includes Voice as its own branch." />
   <meta name="theme-color" content="#07080c" />
   <meta property="og:title" content="Jev · MECE Use-Case Map" />
-  <meta property="og:description" content="State in. Typed decision out. Five pillars. Everything people are building with TypeSafe's System One model." />
+  <meta property="og:description" content="State in. Typed decision out. Six pillars including Voice. Links and handles included." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://galigutta.github.io/jev-use-cases/" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Jev · MECE Use-Case Map" />
-  <meta name="twitter:description" content="The taxonomy of what Jev is for — from X, demos, and the first 48 hours." />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2307080c'/%3E%3Ccircle cx='16' cy='16' r='5' fill='%23f4f1ea'/%3E%3Cpath d='M16 3v5M16 24v5M3 16h5M24 16h5M7 7l3.5 3.5M21.5 21.5L25 25M7 25l3.5-3.5M21.5 10.5L25 7' stroke='%2378e8c8' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -32,24 +30,25 @@
         <a href="#taxonomy">Taxonomy</a>
         <a href="#patterns">Patterns</a>
         <a href="#limits">Limits</a>
+        <a href="#sources">Sources</a>
       </nav>
     </div>
   </header>
 
   <main id="top">
     <section class="hero">
-      <p class="eyebrow">Independent · first 48 hours on X · Sep 2026</p>
+      <p class="eyebrow">Independent · first days on X · Sep 2026 · links included</p>
       <h1>
         <span class="hero__serif">State in.</span>
         <span class="hero__decision">Typed decision out.</span>
       </h1>
       <p class="hero__lede">
         Jev doesn’t chat. It is frontier judgment as a function call —
-        Choice, Score, Noul, confidence — and people are rewriting their agent stacks around it.
-        This page is the <em>MECE map</em> of what they’re actually building.
+        Choice, Score, Noul, confidence — and people are rewriting agent stacks around it.
+        This page is the <em>MECE map</em> of what they’re building, with handles and repos you can open.
       </p>
 
-      <div class="switchboard" aria-label="Five MECE pillars">
+      <div class="switchboard" aria-label="Six MECE pillars">
         <div class="switchboard__core">
           <span class="switchboard__label">Jev</span>
           <span class="switchboard__sub">System One</span>
@@ -74,17 +73,23 @@
           <span class="cable__num">05</span>
           <span class="cable__name">Harness</span>
         </a>
+        <a class="cable cable--6" href="#pillar-voice" data-pillar="voice">
+          <span class="cable__num">06</span>
+          <span class="cable__name">Voice</span>
+        </a>
       </div>
 
       <p class="hero__footnote">
-        Mutually exclusive pillars · collectively exhaustive for decision-shaped work · not affiliated with TypeSafe AI
+        Six mutually exclusive pillars · collectively exhaustive for decision-shaped work ·
+        not affiliated with <a href="https://typesafe.ai/" rel="noopener">TypeSafe AI</a> ·
+        official X <a href="https://x.com/typesafeai" rel="noopener">@typesafeai</a>
       </p>
     </section>
 
     <section id="taxonomy" class="taxonomy">
       <div class="taxonomy__head">
         <h2>The taxonomy</h2>
-        <p>Five trunks. Everything else is a leaf. Tap a pillar to open its leaves — or skim the chips below.</p>
+        <p>Six trunks. Leaves carry links. Tap a pillar — or skim the sticky rail.</p>
       </div>
 
       <nav class="pillar-rail" aria-label="MECE pillars" id="pillar-rail">
@@ -108,6 +113,10 @@
           <span class="rail-btn__num">05</span>
           <span class="rail-btn__label">Agent harness</span>
         </button>
+        <button type="button" class="rail-btn" data-pillar="voice" aria-pressed="false">
+          <span class="rail-btn__num">06</span>
+          <span class="rail-btn__label">Voice</span>
+        </button>
       </nav>
 
       <div class="pillars">
@@ -121,17 +130,11 @@
             <p>Fuzzy classify / route / score / branch inside ordinary software — where brittle rules fail and chat models are overkill.</p>
           </header>
           <ul class="leaves">
-            <li>Support triage — dept, urgency, frustration, refund, policy fit</li>
-            <li>Lead / ICP qualification — prospect vs spam vs applicant</li>
-            <li>Insurance FNOL — complexity, fraud signals → STP vs specialist</li>
-            <li>FinCrime / KYC — narrative risk, entity match, alert priority</li>
-            <li>Legal &amp; compliance flags — missing clauses, prohibited claims</li>
-            <li>E-com listing normalize — attributes, counterfeit, review abuse</li>
-            <li>Returns / refund auto-approve — clear → auto; ambiguous → human</li>
-            <li>PR / alert / ticket ownership — team Choice + severity Score</li>
-            <li>Onboarding article match · feature-request extraction</li>
-            <li>Inbox / newsletter sort · sponsor-form screening</li>
-            <li>Home Assistant automations <span class="src">HA-Jev</span></li>
+            <li>Support triage — dept, urgency, frustration, refund, policy fit · <a href="https://vercel.com/changelog/typesafe-ai-jev-now-available-on-ai-gateway" rel="noopener">Vercel example</a> · <a href="https://docs.typesafe.ai/concepts/use-case-map" rel="noopener">docs map</a></li>
+            <li>Lead / ICP qualification · Insurance FNOL · FinCrime / KYC · Legal compliance flags · <a href="https://docs.typesafe.ai/concepts/use-case-map" rel="noopener">use-case map</a></li>
+            <li>E-com listing normalize, returns auto-approve, PR/alert ownership · <a href="https://docs.typesafe.ai/concepts/use-case-map" rel="noopener">docs</a></li>
+            <li>Home Assistant automations · <a href="https://github.com/AboveColin/HA-Jev" rel="noopener">AboveColin/HA-Jev</a></li>
+            <li>Canonical framing · <a href="https://typesafe.ai/blog/introducing-system-one-models-and-jev" rel="noopener">launch blog</a> · <a href="https://dev.to/valyuai/how-to-use-jev-a-practical-guide-to-typesafes-system-one-model-g5e" rel="noopener">Valyu guide</a></li>
           </ul>
         </article>
 
@@ -145,14 +148,11 @@
             <p>Cheap judgment over giant corpora — the economics that make “run it on everything” suddenly rational.</p>
           </header>
           <ul class="leaves">
-            <li>Paper topic classification — 1,018 × 24 topics ≈ <strong>$0.08</strong> <span class="src">Hassan El Mghari</span></li>
-            <li>SEC / taxonomy collapse — low confidence → parent division</li>
-            <li>Survey &amp; transcript qualitative coding</li>
-            <li>Archive / CMS auto-tagging</li>
-            <li>Review &amp; social theme mining at volume</li>
-            <li>Log / failure clustering</li>
-            <li>Autoresearch feature discovery → classical ML</li>
-            <li>Crowdcheck — batch judgments over 10k synthetic personas</li>
+            <li>Paper topic classification — 1,018 × 24 topics ≈ <strong>$0.08</strong> · <a href="https://1kpapers.com" rel="noopener">1kpapers.com</a> · Hassan El Mghari (via <a href="https://dev.to/valyuai/how-to-use-jev-a-practical-guide-to-typesafes-system-one-model-g5e" rel="noopener">Valyu</a>)</li>
+            <li>SEC / taxonomy collapse, survey coding, CMS tagging, log clustering · <a href="https://docs.typesafe.ai/cookbooks/classification_using_confidence" rel="noopener">confidence taxonomy cookbook</a></li>
+            <li>Autoresearch feature discovery → classical ML · <a href="https://docs.typesafe.ai/cookbooks/autoresearch_feature_discovery" rel="noopener">cookbook</a></li>
+            <li>Crowdcheck — 10k synthetic personas · <a href="https://crowdcheck-ai.vercel.app/" rel="noopener">live demo</a></li>
+            <li>Map-reduce thesis · <a href="https://typesafe.ai/blog/introducing-system-one-models-and-jev" rel="noopener">TypeSafe launch</a></li>
           </ul>
         </article>
 
@@ -166,19 +166,18 @@
             <p>Action selection at game, UI, and market clock rates — perception and safety stay in code; Jev picks the move.</p>
           </header>
           <ul class="leaves">
-            <li>Doom @ ~10 Hz · ~$7/hr <span class="src">@CompleteSkeptic</span></li>
-            <li>Wikiracing — high-cardinality links, no invented URLs</li>
-            <li>Subway Surfers × 50 parallel games <span class="src">@_MaxBlade</span></li>
-            <li>Super Mario from emulator RAM · StarCraft shareware (421 decisions)</li>
-            <li>HEIST//ONE — multi-guard stealth judgments</li>
-            <li>Browser Use / Jev Ultrafast — ZRH→LON Flights ~7.1s / ~$0.0039 <span class="src">@gregpr07</span></li>
-            <li>Desktop computer-use · Cua + jevuse · Android UI agent</li>
-            <li>Drone tactical judgment ~2.5 Hz (advisory only)</li>
-            <li>Market making — Monad/Kuru ~300ms blocks <span class="src">@jarrodwatts</span></li>
-            <li>Typewriter live demo — 16 judgments as you type <span class="src">@stevekrouse</span></li>
-            <li>Smart-home closed-set tool select ~300ms</li>
-            <li>Voice-driven computer use — ASR state → click/type/scroll Choice (Browser Use / Cua-class loops)</li>
-            <li>Secondary turn / end-of-utterance detect — Noul bolted onto aggressive VAD or a primary turn model</li>
+            <li>Doom @ ~10 Hz · ~$7/hr · <a href="https://typesafe.ai/blog/introducing-system-one-models-and-jev" rel="noopener">launch demo</a> · <a href="https://x.com/CompleteSkeptic" rel="noopener">@CompleteSkeptic</a></li>
+            <li>Wikiracing — high-cardinality links · <a href="https://typesafe.ai/blog/introducing-system-one-models-and-jev" rel="noopener">launch demo</a></li>
+            <li>Subway Surfers × 50 parallel · <a href="https://x.com/_MaxBlade" rel="noopener">@_MaxBlade</a> · <a href="https://x.com/kkurilyak" rel="noopener">@kkurilyak</a></li>
+            <li>Super Mario from emulator RAM · <a href="https://github.com/fhshaik/typesafe-mario" rel="noopener">fhshaik/typesafe-mario</a></li>
+            <li>StarCraft shareware (421 decisions) · <a href="https://github.com/phyous/tsai-sc" rel="noopener">phyous/tsai-sc</a></li>
+            <li>HEIST//ONE stealth game · <a href="https://github.com/AbdelStark/heist-one" rel="noopener">AbdelStark/heist-one</a></li>
+            <li>Browser Use / Jev Ultrafast — ZRH→LON ~7.1s / ~$0.0039 · <a href="https://github.com/browser-use/jev-ultrafast" rel="noopener">browser-use/jev-ultrafast</a> · <a href="https://x.com/gregpr07/status/2100411066966749359" rel="noopener">@gregpr07</a></li>
+            <li>Desktop computer-use · <a href="https://github.com/awlevin/typesafe-computer-use" rel="noopener">awlevin/typesafe-computer-use</a> · Cua · <a href="https://github.com/trycua/cua" rel="noopener">trycua/cua</a> · <a href="https://x.com/ValencianaAbel" rel="noopener">@ValencianaAbel</a></li>
+            <li>Android UI agent · <a href="https://github.com/Friedjof/jev-mobile" rel="noopener">Friedjof/jev-mobile</a></li>
+            <li>Drone tactical judgment ~2.5 Hz · <a href="https://github.com/RomanSlack/jev-drone" rel="noopener">RomanSlack/jev-drone</a></li>
+            <li>Market making — Monad/Kuru · <a href="https://github.com/jarrodwatts/jev-trader" rel="noopener">jarrodwatts/jev-trader</a> · <a href="https://x.com/jarrodwatts" rel="noopener">@jarrodwatts</a></li>
+            <li>Typewriter live demo · <a href="https://typesafe-demo.val.run/" rel="noopener">typesafe-demo.val.run</a> · <a href="https://x.com/stevekrouse/status/2100287368221659289" rel="noopener">@stevekrouse</a></li>
           </ul>
         </article>
 
@@ -192,14 +191,11 @@
             <p>Score, judge, and gate prompts, traces, tool calls, drafts, and claims — at a fraction of the LLM call you’re protecting.</p>
           </header>
           <ul class="leaves">
-            <li>Jailbreak / prompt-injection detection on LLM I/O</li>
-            <li>Citation &amp; groundedness — does the passage support the claim?</li>
-            <li>Pre-send draft checks — contradiction, false refund vs account</li>
-            <li>Shell / tool-call risk — read-only vs reversible vs irreversible</li>
-            <li>Agent safety monitor — escalate suspects to a bigger model</li>
-            <li>Writing defect / style lints · semantic CI rules</li>
-            <li>Brand / pre-publish CMS checks</li>
-            <li>Ad brand-safety &amp; claim compliance</li>
+            <li>Jailbreak / prompt-injection · citation groundedness · <a href="https://docs.typesafe.ai/cookbooks/llm_guardrails" rel="noopener">llm_guardrails</a> · <a href="https://docs.typesafe.ai/cookbooks/citation_check" rel="noopener">citation_check</a></li>
+            <li>RAG passage classify / contradiction · <a href="https://docs.typesafe.ai/cookbooks/classifying_rag_passages" rel="noopener">cookbook</a></li>
+            <li>Staged code review · <a href="https://github.com/devagrawal09/jev-review" rel="noopener">devagrawal09/jev-review</a></li>
+            <li>Policy / loop / tool gates · <a href="https://github.com/AbdelStark/bicameral" rel="noopener">bicameral</a> · <a href="https://github.com/DevMortimer/pi-warden" rel="noopener">pi-warden</a> · <a href="https://github.com/shiftynick/jev-axi" rel="noopener">jev-axi</a></li>
+            <li>“Verify everything” thesis · <a href="https://typesafe.ai/blog/introducing-system-one-models-and-jev" rel="noopener">launch blog</a> · <a href="https://vercel.com/changelog/typesafe-ai-jev-now-available-on-ai-gateway" rel="noopener">Vercel</a></li>
           </ul>
         </article>
 
@@ -210,20 +206,59 @@
               <span class="pillar__tag">L7 for agents</span>
             </div>
             <h3>Agent harness engineering</h3>
-            <p>Make the loop cheaper, safer, and composable — Jev as the load balancer sitting above models, tools, and humans.</p>
+            <p>Make the loop cheaper, safer, and composable — Jev as the load balancer above models, tools, and humans.</p>
           </header>
           <ul class="leaves">
-            <li>Next tool / subagent Choice <span class="src">“L7 load balancer for agents”</span></li>
-            <li>Continue / retry / ask user / stop</li>
-            <li>Model router — intent + difficulty + risk → cheap vs frontier</li>
-            <li>Skill / MCP suggestion over large catalogs</li>
-            <li>Context reduction — Claude Code plugin ~30% tokens <span class="src">@ZeBoris_</span></li>
-            <li>Policy gates — Bicameral, pi-warden, jev-axi</li>
-            <li>SDE cascade — mini → verify → escalate</li>
-            <li>MAGI majority vote — three Jev “sages” <span class="src">@nagata_hideyuki</span></li>
-            <li>rtrvr.ai browser agents — claimed ~40% faster tasks</li>
-            <li>Cloudflare AI Gateway · Vercel AI Gateway listings</li>
-            <li>Speak-up gate — should the bot interrupt / reply, with or without a wake word (confidence-gated); unlocks bots in group voice / multi-party settings</li>
+            <li>Next tool / subagent · continue / retry / ask / stop · <a href="https://vercel.com/changelog/typesafe-ai-jev-now-available-on-ai-gateway" rel="noopener">Vercel</a> · <a href="https://x.com/marumarucanada" rel="noopener">@marumarucanada</a> (“L7 for agents”)</li>
+            <li>Model / specialist router · <a href="https://docs.typesafe.ai/concepts/use-case-map" rel="noopener">model routing</a> · <a href="https://x.com/talltalebro" rel="noopener">@talltalebro</a></li>
+            <li>Skill suggestion over large catalogs · <a href="https://docs.typesafe.ai/cookbooks/skill_suggestion" rel="noopener">cookbook</a> · <a href="https://github.com/typesafe-ai/skills" rel="noopener">typesafe-ai/skills</a></li>
+            <li>Context reduction Claude Code plugin · <a href="https://github.com/BorisLeMeec/jev" rel="noopener">BorisLeMeec/jev</a> · <a href="https://x.com/ZeBoris_" rel="noopener">@ZeBoris_</a></li>
+            <li>MAGI majority vote · <a href="https://github.com/hide-G/magi-system-on-jev" rel="noopener">hide-G/magi-system-on-jev</a> · <a href="https://x.com/nagata_hideyuki" rel="noopener">@nagata_hideyuki</a></li>
+            <li>rtrvr.ai browser agents · <a href="https://rtrvr.ai" rel="noopener">rtrvr.ai</a> · <a href="https://x.com/b_kalisetty" rel="noopener">@b_kalisetty</a></li>
+            <li>Gateways · <a href="https://x.com/CloudflareDev" rel="noopener">@CloudflareDev</a> AI Gateway · <a href="https://vercel.com/ai-gateway/models/jev" rel="noopener">Vercel AI Gateway</a></li>
+            <li>Ecosystem index · <a href="https://github.com/AbdelStark/awesome-typesafe" rel="noopener">AbdelStark/awesome-typesafe</a></li>
+          </ul>
+        </article>
+
+        <article class="pillar" id="pillar-voice" data-pillar="voice">
+          <header class="pillar__header">
+            <div class="pillar__id">
+              <span class="pillar__num">06</span>
+              <span class="pillar__tag">Always-on judgment</span>
+            </div>
+            <h3>Voice</h3>
+            <p>Sub-second decisions on the audio path — turn-taking, speak-up, and voice→action — so assistants can live in the room without a wake word or chaos.</p>
+          </header>
+          <ul class="leaves">
+            <li>
+              <strong>Voice-driven computer use</strong> — ASR / dialogue state → click, type, scroll Choice (ears instead of pixels)
+              <span class="leaf-meta">
+                <a href="https://github.com/browser-use/jev-ultrafast" rel="noopener">Browser Use</a>
+                <a href="https://github.com/trycua/cua" rel="noopener">Cua</a>
+                <a href="https://github.com/awlevin/typesafe-computer-use" rel="noopener">computer-use</a>
+              </span>
+            </li>
+            <li>
+              <strong>Secondary turn / end-of-utterance detect</strong> — Noul bolted onto an aggressive VAD or primary turn model
+              <button type="button" class="blurb" title="Conceptual System One leaf (not a public Jev demo yet): stream VAD / primary EOU probabilities into state; ask a Noul like “has the user finished their turn?” and only then commit ASR→LLM. Cheap second opinion before the stack spends a frontier call." aria-label="About this use case">why</button>
+            </li>
+            <li>
+              <strong>Speak-up gate</strong> — should the bot interrupt / reply, with or without a wake word
+              <button type="button" class="blurb" title="Conceptual System One leaf: Choice or Noul over stay silent / acknowledge / full reply, gated on confidence. Wake word optional — calibrated confidence is the gate. Pairs with confidence-routing patterns in TypeSafe docs." aria-label="About this use case">why</button>
+              <span class="leaf-meta"><a href="https://docs.typesafe.ai/patterns/confidence-routing" rel="noopener">confidence routing</a></span>
+            </li>
+            <li>
+              <strong>Group / multi-party bot</strong> — same gate unlocks a bot in a roomful of people
+              <button type="button" class="blurb" title="Extension of the speak-up gate: in multi-speaker audio, decide whether this utterance is for the bot, whether interrupting helps, and whether to stay silent. Without it you need a wake word or you thrash the room." aria-label="About this use case">why</button>
+            </li>
+            <li>
+              Adjacent building blocks
+              <span class="leaf-meta">
+                <a href="https://github.com/browser-use/jev-ultrafast" rel="noopener">jev-ultrafast</a>
+                <a href="https://docs.typesafe.ai/patterns/confidence-routing" rel="noopener">confidence routing</a>
+                <a href="https://typesafe.ai/blog/introducing-system-one-models-and-jev" rel="noopener">launch thesis</a>
+              </span>
+            </li>
           </ul>
         </article>
       </div>
@@ -231,27 +266,27 @@
 
     <section id="patterns" class="patterns">
       <h2>Shared machinery</h2>
-      <p class="section-lede">Not extra use cases — the patterns every leaf is built from.</p>
+      <p class="section-lede">Not extra use cases — the patterns every leaf is built from. <a href="https://docs.typesafe.ai/patterns" rel="noopener">TypeSafe patterns</a>.</p>
       <div class="pattern-grid">
         <article>
           <h3>Speculative fan-out</h3>
-          <p>Ask ten questions in one call. Code keeps what mattered. Time barely moves.</p>
+          <p>Ask ten questions in one call. Code keeps what mattered. <a href="https://docs.typesafe.ai/patterns/fan-out" rel="noopener">docs</a></p>
         </article>
         <article>
           <h3>Confidence gates</h3>
-          <p>Act above the threshold. Human or LLM below. Calibrated belief as architecture.</p>
+          <p>Act above the threshold. Human or LLM below. <a href="https://docs.typesafe.ai/patterns/confidence-routing" rel="noopener">docs</a></p>
         </article>
         <article>
           <h3>Cascade</h3>
-          <p>Jev → pure code → specialist LLM → human. Pay for intelligence only when you need it.</p>
+          <p>Jev → pure code → specialist LLM → human. <a href="https://docs.typesafe.ai/patterns/intent-routing" rel="noopener">intent routing</a></p>
         </article>
         <article>
           <h3>Retrieve, then judge</h3>
-          <p>Fetch precisely. Hand Jev tight state. Accuracy is a function of what you allow it to see.</p>
+          <p>Fetch precisely. Hand Jev tight state. See Valyu <a href="https://dev.to/valyuai/how-to-use-jev-a-practical-guide-to-typesafes-system-one-model-g5e" rel="noopener">Pattern 5</a>.</p>
         </article>
         <article>
           <h3>Composite scoring</h3>
-          <p>Atomic Scores + your weights. Re-weight in code, not in a prompt rewrite.</p>
+          <p>Atomic Scores + your weights. <a href="https://docs.typesafe.ai/patterns/composite-scoring" rel="noopener">docs</a></p>
         </article>
       </div>
     </section>
@@ -264,39 +299,45 @@
             <li>Generating text, code, or rationales</li>
             <li>Arithmetic, counting, date math</li>
             <li>Open answers outside a declared option set</li>
-            <li>Perception / control-rate loops (pixels, 500 Hz flight)</li>
+            <li>Perception / control-rate loops (raw pixels, 500 Hz flight)</li>
           </ul>
+          <p class="section-lede" style="margin-top:0.75rem"><a href="https://docs.typesafe.ai/" rel="noopener">docs.typesafe.ai</a> — jaggedness / limits</p>
         </div>
         <div>
           <h2>Speculative on X</h2>
           <ul>
-            <li>PCB routing via parallel “aerial view” <span class="src">@ne0v0ne</span></li>
-            <li>Drone targeting as a product claim — Register speculation, not TypeSafe</li>
+            <li>PCB routing via parallel “aerial view” · <a href="https://x.com/ne0v0ne" rel="noopener">@ne0v0ne</a></li>
+            <li>Drone targeting as a product claim — Register speculation, not TypeSafe · <a href="https://www.theregister.com/ai-and-ml/2026/09/16/typesafe-ai-debuts-model-for-machines-that-plays-doom/5296711" rel="noopener">The Register</a></li>
           </ul>
         </div>
       </div>
     </section>
 
-    <section class="virality">
+    <section id="sources" class="virality">
       <h2>What’s lighting up X</h2>
       <ol>
-        <li>Diogo’s launch — <span class="src">@CompleteSkeptic</span></li>
-        <li>Doom + Wikiracing demos</li>
-        <li>Browser Use 7-second Flights agent</li>
-        <li>Cloudflare AI Gateway listing</li>
-        <li>Trading bot · Subway Surfers×50 · MAGI · Claude Code saver · Cua</li>
+        <li>Diogo’s launch · <a href="https://x.com/CompleteSkeptic" rel="noopener">@CompleteSkeptic</a> · <a href="https://typesafe.ai/blog/introducing-system-one-models-and-jev" rel="noopener">blog</a></li>
+        <li>Doom + Wikiracing demos · same launch thread</li>
+        <li>Browser Use 7s Flights · <a href="https://x.com/gregpr07/status/2100411066966749359" rel="noopener">@gregpr07</a></li>
+        <li>Cloudflare AI Gateway · <a href="https://x.com/CloudflareDev" rel="noopener">@CloudflareDev</a></li>
+        <li>Trading · Subway Surfers×50 · MAGI · Claude Code saver · Cua — see Realtime / Harness leaves</li>
       </ol>
+      <p class="section-lede" style="margin-top:1.25rem">
+        Curated list · <a href="https://github.com/AbdelStark/awesome-typesafe" rel="noopener">awesome-typesafe</a> ·
+        Evals · <a href="https://evals.typesafe.ai/" rel="noopener">evals.typesafe.ai</a> ·
+        Official X · <a href="https://x.com/typesafeai" rel="noopener">@typesafeai</a>
+      </p>
     </section>
   </main>
 
   <footer class="foot">
     <p>
       Community compilation of public posts, demos, and docs · not affiliated with TypeSafe AI ·
-      official account <a href="https://x.com/typesafeai" rel="noopener">@typesafeai</a>
+      <a href="https://x.com/typesafeai" rel="noopener">@typesafeai</a>
     </p>
     <p>
       <a href="https://github.com/galigutta/jev-use-cases">Source</a>
-      · Map curated Sep 17, 2026
+      · Map curated Sep 17–18, 2026
     </p>
   </footer>
 

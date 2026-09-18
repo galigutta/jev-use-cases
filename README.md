@@ -6,13 +6,14 @@ Inspired, mobile-first showcase of TypeSafe **Jev** use cases from the first day
 
 ## Structure
 
-Five mutually exclusive pillars (TypeSafe’s own framing):
+Six mutually exclusive pillars (TypeSafe’s own framing):
 
 1. Smart workflow decisions  
 2. Bulk map-reduce over data  
 3. Realtime control loops  
 4. Verify & guardrails  
-5. Agent harness engineering  
+5. Agent harness engineering
+6. Voice (turn-taking, speak-up, voice→action)  
 
 Independent community compilation — **not affiliated with TypeSafe AI**.
 
