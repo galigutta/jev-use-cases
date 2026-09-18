@@ -583,29 +583,29 @@ a:focus-visible {
   display: none;
 }
 
-/* Propose panel */
+/* Propose panel — end-of-map CTA */
 .propose {
   max-width: var(--max);
   margin: 0 auto;
-  padding: 0.5rem var(--pad) 2.5rem;
-  scroll-margin-top: calc(var(--header-h) + 0.5rem);
+  padding: 1.5rem var(--pad) 2.75rem;
+  scroll-margin-top: 5.5rem;
 }
 .propose__card {
-  border: 1px solid color-mix(in srgb, var(--workflow) 35%, var(--line));
+  border: 1px solid color-mix(in srgb, var(--voice) 32%, var(--line));
   border-radius: calc(var(--radius) + 6px);
   background:
-    radial-gradient(800px 280px at 10% 0%, rgba(120, 232, 200, 0.12), transparent 55%),
-    radial-gradient(600px 240px at 90% 20%, rgba(126, 182, 255, 0.08), transparent 50%),
+    radial-gradient(900px 280px at 8% -30%, rgba(245, 169, 127, 0.14), transparent 55%),
+    radial-gradient(700px 240px at 100% 0%, rgba(120, 232, 200, 0.07), transparent 50%),
     var(--bg-elev);
-  padding: clamp(1.25rem, 4vw, 1.85rem);
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.28), inset 0 0 0 1px rgba(120, 232, 200, 0.06);
+  padding: clamp(1.35rem, 4vw, 2rem);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.28), inset 0 0 0 1px rgba(245, 169, 127, 0.08);
 }
 .propose__eyebrow {
   margin: 0 0 0.45rem;
   font-size: 0.72rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--ink-dim);
+  color: color-mix(in srgb, var(--voice) 70%, var(--ink-dim));
 }
 .propose__head h2 {
   margin: 0;

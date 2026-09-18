@@ -123,9 +123,7 @@
       "",
       "_Submitted from the [Jev use-case map](https://galigutta.github.io/jev-use-cases/#propose)._",
       "",
-      "**Label:** please add `propose` if it was not auto-applied so the Action can grade with Jev and (if novel) open a Codex PR.",
-      "",
-      "Pipeline: Jev novelty grade → if novel, Codex PR editing `docs/index.html`.",
+      "Please leave the `propose` label so this can be graded against the live map.",
     );
     return parts.join("\n");
   };

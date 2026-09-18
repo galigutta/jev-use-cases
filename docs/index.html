@@ -87,56 +87,6 @@
     </section>
 
 
-    <section id="propose" class="propose" aria-labelledby="propose-title">
-      <div class="propose__card">
-        <div class="propose__head">
-          <p class="propose__eyebrow">Community · no API keys in the browser</p>
-          <h2 id="propose-title">Propose a use case</h2>
-          <p class="propose__lede">
-            Paste a Jev use case. We’ll open a GitHub issue; an Action grades novelty with
-            <strong>Jev</strong>, and if it’s new, <strong>Codex</strong> opens a PR adding one leaf.
-          </p>
-        </div>
-
-        <form id="propose-form" class="propose__form" novalidate>
-          <label class="propose__label" for="propose-text">
-            Description
-            <textarea id="propose-text" name="description" rows="5" required
-              placeholder="e.g. Jev scores support tickets for refund eligibility and routes by confidence…"></textarea>
-          </label>
-          <label class="propose__label" for="propose-url">
-            Source URL <span class="propose__optional">(optional)</span>
-            <input id="propose-url" name="source_url" type="url" inputmode="url"
-              placeholder="https://x.com/… or github.com/…" />
-          </label>
-          <div class="propose__actions">
-            <button type="submit" class="propose__submit" id="propose-submit">
-              Open GitHub issue
-            </button>
-            <p class="propose__hint">
-              Opens
-              <a href="https://github.com/galigutta/jev-use-cases/issues/new?template=propose_use_case.yml" rel="noopener">new issue</a>
-              with title <code>[propose] …</code>. Add label <code>propose</code> if it isn’t auto-applied.
-            </p>
-          </div>
-        </form>
-
-        <div class="propose__status" id="propose-status" role="status" aria-live="polite">
-          <ol class="propose__flow">
-            <li><strong>You</strong> submit → GitHub issue with your text/URL</li>
-            <li><strong>Action</strong> grades with Jev against the live MECE inventory</li>
-            <li>If <em>novel</em>, Codex edits <code>docs/index.html</code> and opens a PR</li>
-          </ol>
-          <p class="propose__links">
-            <a href="https://github.com/galigutta/jev-use-cases/issues" rel="noopener">Issues</a>
-            ·
-            <a href="https://github.com/galigutta/jev-use-cases/actions" rel="noopener">Actions</a>
-            ·
-            <a href="https://github.com/galigutta/jev-use-cases/issues/new?template=propose_use_case.yml" rel="noopener">Issue form</a>
-          </p>
-        </div>
-      </div>
-    </section>
 
     <section id="taxonomy" class="taxonomy">
       <div class="taxonomy__head">
@@ -524,6 +474,54 @@
             </li>
           </ul>
         </article>
+      </div>
+    </section>
+
+
+    <section id="propose" class="propose" aria-labelledby="propose-title">
+      <div class="propose__card">
+        <div class="propose__head">
+          <p class="propose__eyebrow">Grow the map</p>
+          <h2 id="propose-title">Propose a use case</h2>
+          <p class="propose__lede">
+            Spotted a Jev decision that isn’t here yet? Drop it in —
+            if it clears a high novelty bar, it lands on the map.
+          </p>
+        </div>
+
+        <form id="propose-form" class="propose__form" novalidate>
+          <label class="propose__label" for="propose-text">
+            What should people use Jev for?
+            <textarea id="propose-text" name="description" rows="5" required
+              placeholder="e.g. Score support tickets for refund eligibility and route by confidence…"></textarea>
+          </label>
+          <label class="propose__label" for="propose-url">
+            Source <span class="propose__optional">(optional link)</span>
+            <input id="propose-url" name="source_url" type="url" inputmode="url"
+              placeholder="https://x.com/… or github.com/…" />
+          </label>
+          <div class="propose__actions">
+            <button type="submit" class="propose__submit" id="propose-submit">
+              Submit proposal
+            </button>
+            <p class="propose__hint">
+              Continues on GitHub as a short issue so the map can stay curated.
+            </p>
+          </div>
+        </form>
+
+        <div class="propose__status" id="propose-status" role="status" aria-live="polite">
+          <ol class="propose__flow">
+            <li><strong>You</strong> describe the use case</li>
+            <li><strong>Jev</strong> checks it against every leaf already on the page</li>
+            <li>If it’s truly new, it gets a leaf and ships to the map</li>
+          </ol>
+          <p class="propose__links">
+            <a href="https://github.com/galigutta/jev-use-cases/issues" rel="noopener">See proposals</a>
+            ·
+            <a href="https://github.com/galigutta/jev-use-cases" rel="noopener">Source</a>
+          </p>
+        </div>
       </div>
     </section>
 
