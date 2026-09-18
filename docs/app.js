@@ -204,9 +204,6 @@
     return `<p class="propose__why">Held back by: ${why.map((w) => labels[w] || escapeText(w)).join(" · ")}</p>`;
   };
 
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;");
 
   const setLive = (state, html) => {
     const live = ensureLive();
