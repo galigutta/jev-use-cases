@@ -634,11 +634,19 @@ def main() -> int:
         and overlap_conf >= OVERLAP_FORCE_DUP_CONF
     )
     overlap_ok = overlap_choice == "none" or overlap_conf < OVERLAP_FORCE_DUP_CONF
-    novel = (
+    # If Jev finds no closest leaf, it is not "already on the map" — add it.
+    no_closest = overlap_choice == "none"
+    clears_bar = (
         noul >= noul_threshold
         and novelty_score >= score_threshold
         and overlap_ok
         and not overlap_forces_dup
+    )
+    novel = no_closest or clears_bar
+    accepted_via = (
+        "no_closest_overlap"
+        if no_closest and not clears_bar
+        else ("clears_bar" if novel else None)
     )
     verdict = "novel" if novel else "duplicate"
 
@@ -659,6 +667,7 @@ def main() -> int:
     out = {
         "verdict": verdict,
         "novel": novel,
+        "accepted_via": accepted_via,
         "threshold": noul_threshold,
         "noul_threshold": noul_threshold,
         "score_threshold": score_threshold,

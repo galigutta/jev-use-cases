@@ -427,18 +427,18 @@
         const detail = data.html_url
           ? `<a href="${data.html_url}" rel="noopener">See details</a>`
           : `<a href="https://github.com/galigutta/jev-use-cases/pulls" rel="noopener">Watch PRs</a>`;
-        setLive(
-          "ok",
-          `<p class="propose__headline"><strong>Accepted</strong> — new under the map. A leaf is writing now and will <strong>auto-merge</strong> in a couple of minutes. Refresh after merge. ${detail}</p>` +
-            renderGradeMetrics(data),
-        );
+        const viaNone = data.accepted_via === "no_closest_overlap";
+        const head = viaNone
+          ? `<p class="propose__headline"><strong>Accepted</strong> — no closest leaf on the map, so we’re adding it. A leaf will <strong>auto-merge</strong> in a couple of minutes. Refresh after merge. ${detail}</p>`
+          : `<p class="propose__headline"><strong>Accepted</strong> — new under the map. A leaf is writing now and will <strong>auto-merge</strong> in a couple of minutes. Refresh after merge. ${detail}</p>`;
+        setLive("ok", head + renderGradeMetrics(data));
       } else if (data.verdict === "duplicate" || data.novel === false) {
-        setLive(
-          "dup",
-          `<p class="propose__headline"><strong>Already on the map</strong> — nothing was filed.</p>` +
-            renderGradeMetrics(data) +
-            whyLine(data),
-        );
+        const hasOverlap =
+          data.overlap_text || (data.overlap && data.overlap !== "none");
+        const head = hasOverlap
+          ? `<p class="propose__headline"><strong>Already on the map</strong> — nothing was filed.</p>`
+          : `<p class="propose__headline"><strong>Not added</strong> — didn’t clear the novelty bar. Nothing was filed.</p>`;
+        setLive("dup", head + renderGradeMetrics(data) + whyLine(data));
       } else if (data.number && data.html_url) {
         startWatching({ number: data.number, html_url: data.html_url });
       } else {

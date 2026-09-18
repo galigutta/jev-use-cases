@@ -463,21 +463,29 @@ async function grade(apiKey, note, sourceUrl, urlText, existing) {
     String(overlapChoice).startsWith("leaf_") &&
     overlapConf >= OVERLAP_FORCE_DUP;
   const overlapOk = overlapChoice === "none" || overlapConf < OVERLAP_FORCE_DUP;
-  const novel = noul >= noulThr && noveltyScore >= scoreThr && overlapOk && !overlapForcesDup;
+  // If Jev finds no closest leaf, it is not "already on the map" — add it.
+  const noClosest = overlapChoice === "none";
+  const clearsBar =
+    noul >= noulThr && noveltyScore >= scoreThr && overlapOk && !overlapForcesDup;
+  const novel = noClosest || clearsBar;
+  const acceptedVia = noClosest && !clearsBar ? "no_closest_overlap" : novel ? "clears_bar" : null;
 
   const gates = {
-    noul_pass: noul >= noulThr,
-    score_pass: noveltyScore >= scoreThr,
+    noul_pass: noClosest || noul >= noulThr,
+    score_pass: noClosest || noveltyScore >= scoreThr,
     overlap_ok: overlapOk && !overlapForcesDup,
   };
   const why = [];
-  if (!gates.noul_pass) why.push("noul_below_threshold");
-  if (!gates.score_pass) why.push("score_below_threshold");
-  if (!gates.overlap_ok) why.push("overlap_force_duplicate");
+  if (!novel) {
+    if (!(noul >= noulThr)) why.push("noul_below_threshold");
+    if (!(noveltyScore >= scoreThr)) why.push("score_below_threshold");
+    if (overlapForcesDup || !overlapOk) why.push("overlap_force_duplicate");
+  }
 
   return {
     novel,
     verdict: novel ? "novel" : "duplicate",
+    accepted_via: acceptedVia,
     pillar,
     pillar_confidence: pillarConfidence,
     noul,
@@ -594,6 +602,7 @@ export default {
     const publicGrade = {
       novel: gradeResult.novel,
       verdict: gradeResult.verdict,
+      accepted_via: gradeResult.accepted_via,
       pillar: gradeResult.pillar,
       pillar_confidence: gradeResult.pillar_confidence,
       noul: gradeResult.noul,
