@@ -96,7 +96,7 @@
     if (e.key === "Escape") closeAllBlurbs();
   });
 
-  // Propose stays on-page: POST to API → create issue → poll for Jev verdict
+  // Propose stays on-page: POST to Worker (Jev in-request). Duplicate → verdict only; novel → dispatch. Legacy poll kept for issue-shaped responses.
   const proposeForm = document.getElementById("propose-form");
   const proposeStatus = document.getElementById("propose-status");
   const API_ISSUES =
@@ -122,16 +122,34 @@
       live.className = "propose__live";
       live.setAttribute("role", "status");
       live.setAttribute("aria-live", "polite");
+      live.setAttribute("tabindex", "-1");
       proposeStatus.prepend(live);
     }
     return live;
   };
+
+  const escapeText = (s) =>
+    String(s)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
 
   const setLive = (state, html) => {
     const live = ensureLive();
     if (!live) return;
     live.dataset.state = state || "info";
     live.innerHTML = html;
+    const hasVerdict = state === "ok" || state === "dup" || state === "info";
+    proposeStatus.toggleAttribute("data-has-verdict", hasVerdict);
+    // Focus the banner for network outcomes only — keep field focus on validation.
+    if (state === "ok" || state === "dup") {
+      try {
+        live.focus({ preventScroll: false });
+      } catch {
+        /* ignore */
+      }
+    }
   };
 
   let pollTimer = null;
@@ -199,17 +217,17 @@
           if (v.kind === "novel") {
             setLive(
               "ok",
-              `<strong>Accepted</strong> — it’s new` +
-                (v.pillar ? ` (→ <em>${v.pillar}</em>)` : "") +
-                `. A leaf is being written and <strong>auto-merged</strong> onto the map. ` +
+              `<strong>Accepted</strong> — new` +
+                (v.pillar ? ` under <em>${escapeText(v.pillar)}</em>` : "") +
+                `. A leaf is writing now and will <strong>auto-merge</strong> in a couple of minutes. Refresh the map after merge. ` +
                 `<a href="${issue.html_url}" rel="noopener">See details</a>`,
             );
           } else if (v.kind === "duplicate") {
             setLive(
               "dup",
-              `<strong>Already on the map</strong> (or too close to an existing leaf)` +
+              `<strong>Already on the map</strong>` +
                 (v.overlap && v.overlap !== "none"
-                  ? `: <em>${v.overlap.replace(/</g, "&lt;")}</em>`
+                  ? `. Closest leaf: <em>${escapeText(v.overlap)}</em>`
                   : "") +
                 `. Nothing was merged. ` +
                 `<a href="${issue.html_url}" rel="noopener">See the grade</a>`,
@@ -264,7 +282,7 @@
 
     if (!url && !description) {
       urlEl?.focus();
-      setLive("info", "Paste a link (or a short note).");
+      setLive("info", "Add a link or a short note to propose.");
       return;
     }
     if (url && !looksLikeUrl(url)) {
@@ -273,8 +291,14 @@
       return;
     }
 
-    if (submitBtn) submitBtn.disabled = true;
-    setLive("waiting", "Checking with Jev…");
+    const idleLabel = submitBtn?.textContent || "Submit proposal";
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.setAttribute("aria-busy", "true");
+      submitBtn.textContent = "Checking…";
+    }
+    proposeStatus?.removeAttribute("data-has-verdict");
+    setLive("waiting", "Checking with Jev — usually a few seconds…");
 
     try {
       const res = await fetch(PROPOSE_API, {
@@ -284,30 +308,34 @@
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        throw new Error(data.error || `Submit failed (HTTP ${res.status})`);
+        const raw = data.error || `Submit failed (HTTP ${res.status})`;
+        const friendly = /could not resolve content/i.test(String(raw))
+          ? `We couldn’t read that link — ${String(raw).replace(/^Could not resolve content from URL:\s*/i, "")}`
+          : raw;
+        throw new Error(friendly);
       }
 
       // Worker grades with Jev in-request. Duplicates never create a GitHub issue.
       if (data.verdict === "novel" || data.novel === true) {
         const detail = data.html_url
-          ? ` <a href="${data.html_url}" rel="noopener">Details</a>`
-          : ` <a href="https://github.com/galigutta/jev-use-cases/pulls" rel="noopener">Watch the PR</a>`;
+          ? ` <a href="${data.html_url}" rel="noopener">See details</a>`
+          : ` <a href="https://github.com/galigutta/jev-use-cases/pulls" rel="noopener">Watch PRs</a>`;
         setLive(
           "ok",
-          `<strong>Accepted</strong> — it’s new` +
-            (data.pillar ? ` (→ <em>${data.pillar}</em>)` : "") +
-            `. A leaf is being written and <strong>auto-merged</strong> onto the map.` +
+          `<strong>Accepted</strong> — new` +
+            (data.pillar ? ` under <em>${escapeText(data.pillar)}</em>` : "") +
+            `. A leaf is writing now and will <strong>auto-merge</strong> in a couple of minutes. Refresh the map after merge.` +
             detail,
         );
       } else if (data.verdict === "duplicate" || data.novel === false) {
         const overlap = data.overlap_text || data.overlap || "";
         setLive(
           "dup",
-          `<strong>Already on the map</strong> (or too close to an existing leaf)` +
+          `<strong>Already on the map</strong>` +
             (overlap && overlap !== "none"
-              ? `: <em>${String(overlap).replace(/</g, "&lt;")}</em>`
+              ? `. Closest leaf: <em>${escapeText(overlap)}</em>`
               : "") +
-            `. Nothing was filed or merged.`,
+            `. Nothing was filed.`,
         );
       } else if (data.number && data.html_url) {
         startWatching({ number: data.number, html_url: data.html_url });
@@ -317,10 +345,14 @@
     } catch (err) {
       setLive(
         "info",
-        `Couldn’t submit from the page: ${String(err.message || err).slice(0, 140)}. Try again in a moment.`,
+        `Couldn’t submit from the page: ${escapeText(String(err.message || err).slice(0, 140))}. Try again in a moment.`,
       );
     } finally {
-      if (submitBtn) submitBtn.disabled = false;
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.removeAttribute("aria-busy");
+        submitBtn.textContent = idleLabel;
+      }
     }
   });
 

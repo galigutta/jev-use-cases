@@ -491,7 +491,8 @@
           <h2 id="propose-title">Propose a use case</h2>
           <p class="propose__lede">
             Paste an X post, GitHub repo, or article. We pull the content, Jev
-            checks it against the map, and if it’s truly new it <strong>auto-merges</strong> as a leaf.
+            checks it against the map, and if it’s truly new it <strong>auto-merges</strong>
+            as a leaf — usually within a couple of minutes.
           </p>
         </div>
 
@@ -511,19 +512,19 @@
               Submit proposal
             </button>
             <p class="propose__hint">
-              Link alone is enough. Optional note if you want to steer the leaf.
+              No account needed. Duplicates stay on this page — nothing is filed.
             </p>
           </div>
         </form>
 
-        <div class="propose__status" id="propose-status" role="status" aria-live="polite">
+        <div class="propose__status" id="propose-status">
           <ol class="propose__flow">
-            <li><strong>You</strong> paste a link (and maybe a short note)</li>
-            <li><strong>Jev</strong> grades it instantly — status shows up here</li>
-            <li>If it’s new, the verdict goes straight to auto-merge; if not, you’ll see “already on the map” (nothing is filed)</li>
+            <li><strong>You</strong> paste a link — optional note if the link needs context</li>
+            <li><strong>Jev</strong> grades it here in a few seconds (no page hop)</li>
+            <li><strong>New</strong> → leaf auto-merges onto the map. <strong>Already covered</strong> → you see the overlap; nothing is filed</li>
           </ol>
           <p class="propose__links">
-            <a href="https://github.com/galigutta/jev-use-cases/issues" rel="noopener">See proposals</a>
+            <a href="https://github.com/galigutta/jev-use-cases/pulls" rel="noopener">Open PRs</a>
             ·
             <a href="https://github.com/galigutta/jev-use-cases" rel="noopener">Source</a>
           </p>
