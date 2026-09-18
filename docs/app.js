@@ -131,7 +131,9 @@
   const escapeText = (s) =>
     String(s)
       .replace(/&/g, "&amp;")
-
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
 
   const fmtNum = (n, digits = 2) => {
     const x = Number(n);
