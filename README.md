@@ -24,25 +24,25 @@ Anyone can suggest a new leaf. Static GitHub Pages **cannot** hold API keys — 
 ### Flow
 
 1. **Site or issue** — Use the **Propose a use case** panel on the live map (or open the [Propose use case](https://github.com/galigutta/jev-use-cases/issues/new?template=propose_use_case.yml) issue form). The browser only opens a GitHub **new issue** with title `[propose] …` and your text/URL (optional label `propose`).
-2. **Jev grades** — Workflow `.github/workflows/propose-use-case.yml` extracts the current leaves from `docs/index.html`, then calls TypeSafe Jev (`POST https://api.typesafe.ai/v1/systemone`) to decide novelty, pillar, and overlap.
-3. **If duplicate** — The Action comments the verdict on the issue and stops.
-4. **If novel** — Codex (`openai/codex-action`) edits `docs/index.html` to add one leaf under the chosen pillar, pushes `propose/<issue>` (or `propose/run-<id>`), opens a PR, and comments the PR link on the issue.
+2. **Jev grades** — Workflow `.github/workflows/propose-use-case.yml` extracts the current leaves from `docs/index.html`, then calls TypeSafe Jev (`POST https://api.typesafe.ai/v1/systemone`) in a **two-stage packed** call (pillar route → novelty vs peers) so state stays under Jev’s context limits. The novelty bar is **high and saturates** with catalog size (noul ≥ ~0.78→0.92 and score ≥ ~2.7→3.5 as leaves approach 200); confident overlap forces duplicate.
+3. **If duplicate** — The Action comments the saturated-threshold verdict on the issue and stops.
+4. **If novel** — Codex (`openai/codex-action`, model `gpt-5.6-luna`, effort `max`) edits `docs/index.html` to add one leaf under the chosen pillar, opens a PR, **auto-merges** it to `main` (squash + delete branch), and comments / closes the issue.
 
 ```
 You → GitHub issue [propose]
         ↓
    extract_use_cases.py
         ↓
-   grade_novelty.py  (TYPESAFE_API_KEY → Jev)
+   grade_novelty.py  (TYPESAFE_API_KEY → Jev, two-stage + sat bar)
         ↓
    novel? ──no──► comment + stop
         │ yes
         ↓
    build_codex_prompt.py
         ↓
-   openai/codex-action  (OPENAI_API_KEY)
+   openai/codex-action  (OPENAI_API_KEY · gpt-5.6-luna · effort max)
         ↓
-   commit · push · gh pr create · comment
+   commit · push · gh pr create · auto-merge · comment/close
 ```
 
 ### Required repository secrets
@@ -54,7 +54,7 @@ Set these under **Settings → Secrets and variables → Actions** (never in `do
 | `TYPESAFE_API_KEY` | `scripts/grade_novelty.py` | TypeSafe Jev System One API |
 | `OPENAI_API_KEY` | `openai/codex-action@v1` | Codex leaf authoring |
 
-`GITHUB_TOKEN` (automatic) is enough to push a branch and open a PR on this public repo.
+`GITHUB_TOKEN` (automatic) is enough to push a branch, open a PR, and auto-merge on this public repo (no branch protection).
 
 ### Manual / dispatch triggers
 

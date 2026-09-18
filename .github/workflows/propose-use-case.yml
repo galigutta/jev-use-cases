@@ -187,22 +187,34 @@ jobs:
           overlap = a.get("overlap") or {}
           novel = data.get("novel")
           verdict = data.get("verdict")
-          thr = data.get("threshold")
+          noul_thr = data.get("noul_threshold", data.get("threshold"))
+          score_thr = data.get("score_threshold")
+          sat = data.get("sat")
+          n_leaves = data.get("n_leaves")
+          state_chars = data.get("state_chars") or {}
           lines = [
               "## Jev novelty grade",
               "",
               f"- **Verdict:** `{verdict}`",
-              f"- **is_novel (noul):** `{noul}` (threshold ≥ `{thr}` → novel)",
+              f"- **is_novel (noul):** `{noul}` (saturated threshold ≥ `{noul_thr}`)",
+              f"- **Novelty score:** `{score}` (saturated threshold ≥ `{score_thr}`)",
+              f"- **Saturation:** sat=`{sat}` · n_leaves=`{n_leaves}` (bar rises with catalog size)",
               f"- **Pillar:** `{pillar}`" + (f" (confidence `{pconf}`)" if pconf is not None else ""),
-              f"- **Novelty score:** `{score}`",
               f"- **Closest overlap:** `{overlap.get('choice')}`" + (f" — {overlap.get('leaf_text')}" if overlap.get("leaf_text") else ""),
+              f"- **Two-stage packing:** state_chars pillar=`{state_chars.get('pillar_route')}` novelty=`{state_chars.get('novelty')}`",
               f"- **Model:** `{data.get('model')}`",
               "",
           ]
           if novel:
-              lines.append("Proposal looks **novel**. Starting Codex to draft a PR leaf under the chosen pillar.")
+              lines.append(
+                  "Proposal clears the **stricter saturated novelty bar**. "
+                  "Starting Codex (gpt-5.6-luna, effort max) to draft a leaf; PR will auto-merge to main."
+              )
           else:
-              lines.append("Proposal looks like a **duplicate / already covered**. Stopping — no PR.")
+              lines.append(
+                  "Proposal does **not** clear the stricter saturated novelty bar "
+                  "(rephrase / subset / same decision shape / low score / confident overlap). Stopping — no PR."
+              )
           print("\n".join(lines))
           PY
           gh issue comment "${{ steps.input.outputs.issue_number }}" --body-file /tmp/verdict-comment.md
@@ -246,6 +258,8 @@ jobs:
           prompt-file: codex-prompt.md
           permission-profile: ":workspace"
           safety-strategy: drop-sudo
+          model: gpt-5.6-luna
+          effort: max
 
       - name: Commit, push, open PR
         if: steps.grade.outputs.novel == 'true'
@@ -318,6 +332,39 @@ jobs:
             PR_URL="$(gh pr view "$BRANCH" --json url -q .url 2>/dev/null || true)"
           fi
           echo "PR_URL=${PR_URL}"
-          if [ -n "${ISSUE}" ] && [ -n "${PR_URL}" ]; then
-            gh issue comment "$ISSUE" --body "Codex opened a PR: ${PR_URL}"
+
+          if [ -z "${PR_URL}" ]; then
+            MSG="Failed to open a PR for branch ${BRANCH}."
+            echo "$MSG"
+            if [ -n "${ISSUE}" ]; then
+              gh issue comment "$ISSUE" --body "$MSG"
+            fi
+            exit 1
+          fi
+
+          # Fully automatic merge (repo has no branch protection; --admin ok if available)
+          MERGE_OK=0
+          if gh pr merge "$PR_URL" --squash --delete-branch --admin \
+            || gh pr merge "$PR_URL" --squash --delete-branch; then
+            MERGE_OK=1
+          fi
+
+          if [ "$MERGE_OK" -eq 1 ]; then
+            MSG="Merged to main (squash): ${PR_URL}"
+            echo "$MSG"
+            if [ -n "${ISSUE}" ]; then
+              gh issue comment "$ISSUE" --body "$MSG"
+              # Closes keyword may already close; ensure issue is closed if still open
+              STATE="$(gh issue view "$ISSUE" --json state -q .state 2>/dev/null || true)"
+              if [ "$STATE" = "OPEN" ]; then
+                gh issue close "$ISSUE" --comment "Closed after novel leaf auto-merged to main." || true
+              fi
+            fi
+          else
+            MSG="PR opened but auto-merge failed: ${PR_URL}"
+            echo "$MSG"
+            if [ -n "${ISSUE}" ]; then
+              gh issue comment "$ISSUE" --body "$MSG"
+            fi
+            exit 1
           fi
