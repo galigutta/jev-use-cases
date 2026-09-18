@@ -45,9 +45,21 @@ def main() -> int:
     overlap = answers.get("overlap") or {}
     accepted_via = data.get("accepted_via") or ""
 
-    # Suggest a leaf id slug from the first line of proposal / note / url
-    seed = note or proposal.split("\n", 1)[0] or source_url or "new-use-case"
-    seed = re.sub(r"^Use case proposed via link\S*\s*", "", seed).strip()
+    # Prefer human title text for the suggested leaf id (not the boilerplate URL line).
+    lines = [ln.strip() for ln in proposal.splitlines() if ln.strip()]
+    seed = note
+    if not seed:
+        for ln in lines:
+            if ln.lower().startswith("use case proposed via link"):
+                continue
+            if ln.startswith("http://") or ln.startswith("https://"):
+                continue
+            seed = ln
+            break
+    if not seed and source_url:
+        # last path segment of URL as weak fallback
+        seed = source_url.rstrip("/").rsplit("/", 1)[-1]
+    seed = seed or "new-use-case"
     suggested_id = f"leaf-{pillar}-{slugify(seed)}"
 
     issue_line = ""
