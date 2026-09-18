@@ -96,8 +96,10 @@ jobs:
                   )
                   return (m.group(1).strip() if m else "").strip()
 
-              proposal = section("Description")
               source_url = section("Source URL")
+              proposal = section("Description")
+              if proposal.startswith("_Link-only"):
+                  proposal = ""
               # Drop placeholder / empty markers
               if source_url in ("_No response_", "None", "n/a", "N/A"):
                   source_url = ""
@@ -110,6 +112,14 @@ jobs:
                   proposal = re.sub(r"^\[propose\]\s*", "", title, flags=re.I).strip()
                   if body.strip():
                       proposal = (proposal + "\n\n" + body.strip()).strip() if proposal else body.strip()
+
+          # Link-first: description may be empty if source_url is set.
+          # If description is itself a bare URL, treat as source_url.
+          if not source_url and re.match(r"^https?://\S+$", proposal or "", re.I):
+              source_url = proposal.strip()
+              proposal = ""
+          if not proposal and not source_url:
+              raise SystemExit("Need a Source URL and/or Description")
 
           Path("proposal.txt").write_text(proposal, encoding="utf-8")
           Path("source_url.txt").write_text(source_url, encoding="utf-8")
@@ -139,6 +149,7 @@ jobs:
         id: grade
         env:
           TYPESAFE_API_KEY: ${{ secrets.TYPESAFE_API_KEY }}
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           if [ -z "${TYPESAFE_API_KEY:-}" ]; then

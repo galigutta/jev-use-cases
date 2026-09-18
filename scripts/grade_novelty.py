@@ -16,6 +16,7 @@ import os
 import re
 import sys
 import urllib.error
+import urllib.parse
 import urllib.request
 from pathlib import Path
 from typing import Any
@@ -80,31 +81,203 @@ def thresholds_for(n_leaves: int) -> tuple[float, float, float]:
     return sat, noul_thr, score_thr
 
 
-def fetch_url_text(url: str, timeout: float = 12.0) -> str | None:
-    if not url or not re.match(r"^https?://", url, re.I):
-        return None
+MAX_URL_FETCH = 12_000  # fetch budget before Jev packing truncates
+
+
+def _http_get(url: str, timeout: float = 15.0, accept: str = "*/*") -> tuple[bytes, str]:
     req = urllib.request.Request(
         url,
         headers={
-            "User-Agent": "jev-use-cases-novelty-grader/1.0",
-            "Accept": "text/html,text/plain,*/*",
+            "User-Agent": (
+                "Mozilla/5.0 (compatible; jev-use-cases-novelty-grader/1.1; +https://galigutta.github.io/jev-use-cases/)"
+            ),
+            "Accept": accept,
         },
         method="GET",
     )
+    with urllib.request.urlopen(req, timeout=timeout) as resp:
+        return resp.read(MAX_URL_FETCH * 2), (resp.headers.get("Content-Type") or "").lower()
+
+
+def _strip_html(html: str) -> str:
+    # Prefer OG / twitter meta when present
+    metas: list[str] = []
+    for prop in (
+        r'property=["\']og:title["\']',
+        r'property=["\']og:description["\']',
+        r'name=["\']twitter:title["\']',
+        r'name=["\']twitter:description["\']',
+        r'name=["\']description["\']',
+    ):
+        m = re.search(
+            rf"<meta[^>]+{prop}[^>]+content=[\"\']([^\"\']+)[\"\']|<meta[^>]+content=[\"\']([^\"\']+)[\"\'][^>]+{prop}",
+            html,
+            re.I,
+        )
+        if m:
+            val = (m.group(1) or m.group(2) or "").strip()
+            if val:
+                metas.append(val)
+    title_m = re.search(r"(?is)<title[^>]*>(.*?)</title>", html)
+    if title_m:
+        metas.insert(0, re.sub(r"\s+", " ", title_m.group(1)).strip())
+    body = re.sub(r"(?is)<script[^>]*>.*?</script>", " ", html)
+    body = re.sub(r"(?is)<style[^>]*>.*?</style>", " ", body)
+    body = re.sub(r"(?s)<[^>]+>", " ", body)
+    body = re.sub(r"\s+", " ", body).strip()
+    parts = []
+    seen = set()
+    for p in metas + ([body] if body else []):
+        if p and p not in seen:
+            seen.add(p)
+            parts.append(p)
+    return " — ".join(parts) if parts else body
+
+
+def _x_status_id(url: str) -> str | None:
+    m = re.search(
+        r"(?:twitter|x)\.com/[^/]+/status(?:es)?/(\d+)",
+        url,
+        re.I,
+    )
+    return m.group(1) if m else None
+
+
+def fetch_x_status(url: str) -> str | None:
+    """Resolve X/Twitter posts via FxTwitter JSON (works when x.com HTML is blocked)."""
+    sid = _x_status_id(url)
+    if not sid:
+        return None
+    endpoints = [
+        f"https://api.fxtwitter.com/status/{sid}",
+        f"https://api.vxtwitter.com/Twitter/status/{sid}",
+    ]
+    for ep in endpoints:
+        try:
+            raw, ctype = _http_get(ep, accept="application/json")
+            data = json.loads(raw.decode("utf-8", errors="replace"))
+            # FxTwitter shapes vary: {tweet: {...}} or flat
+            tweet = data.get("tweet") or data.get("status") or data
+            if not isinstance(tweet, dict):
+                continue
+            author = (
+                (tweet.get("author") or {}).get("screen_name")
+                or tweet.get("user_screen_name")
+                or tweet.get("author_screen_name")
+                or ""
+            )
+            text = (
+                tweet.get("text")
+                or tweet.get("full_text")
+                or (tweet.get("body") or {}).get("text")
+                or ""
+            )
+            if not text and isinstance(data.get("text"), str):
+                text = data["text"]
+            text = re.sub(r"\s+", " ", str(text)).strip()
+            if not text:
+                continue
+            handle = f"@{author} " if author else ""
+            return f"{handle}{text}"[:MAX_URL_FETCH]
+        except Exception as exc:  # noqa: BLE001
+            print(f"warn: X fetch via {ep} failed ({exc})", file=sys.stderr)
+    # oEmbed fallback
     try:
-        with urllib.request.urlopen(req, timeout=timeout) as resp:
-            raw = resp.read(MAX_URL_SNIPPET * 4)
-            ctype = (resp.headers.get("Content-Type") or "").lower()
-            if "html" in ctype or url.rstrip("/").endswith((".html", ".htm")) or b"<" in raw[:200]:
+        oembed = (
+            "https://publish.twitter.com/oembed?omit_script=true&url="
+            + urllib.parse.quote(url, safe="")
+        )
+        raw, _ = _http_get(oembed, accept="application/json")
+        data = json.loads(raw.decode("utf-8", errors="replace"))
+        html = data.get("html") or ""
+        author = data.get("author_name") or ""
+        plain = _strip_html(html)
+        if plain:
+            return (f"{author}: {plain}" if author else plain)[:MAX_URL_FETCH]
+    except Exception as exc:  # noqa: BLE001
+        print(f"warn: X oEmbed failed ({exc})", file=sys.stderr)
+    return None
+
+
+def fetch_github_text(url: str) -> str | None:
+    """Repo README or file blob via GitHub API / raw.githubusercontent.com."""
+    m = re.match(
+        r"https?://github\.com/([^/]+)/([^/#?]+)(?:/(tree|blob)/([^/]+)/?(.*))?/?$",
+        url.strip(),
+        re.I,
+    )
+    if not m:
+        return None
+    owner, repo, kind, ref, path = m.group(1), m.group(2).removesuffix(".git"), m.group(3), m.group(4), (m.group(5) or "").strip()
+    try:
+        if kind == "blob" and ref and path:
+            raw_url = f"https://raw.githubusercontent.com/{owner}/{repo}/{ref}/{path}"
+            raw, _ = _http_get(raw_url, accept="text/plain,*/*")
+            text = raw.decode("utf-8", errors="replace")
+            return re.sub(r"\s+", " ", text).strip()[:MAX_URL_FETCH]
+        # default: README via API
+        api = f"https://api.github.com/repos/{owner}/{repo}/readme"
+        if ref:
+            api += f"?ref={urllib.parse.quote(ref)}"
+        headers = {
+            "User-Agent": "jev-use-cases-novelty-grader/1.1",
+            "Accept": "application/vnd.github.raw",
+        }
+        token = os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN")
+        if token:
+            headers["Authorization"] = f"Bearer {token}"
+        req = urllib.request.Request(api, headers=headers)
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            text = resp.read(MAX_URL_FETCH * 2).decode("utf-8", errors="replace")
+        return re.sub(r"\s+", " ", text).strip()[:MAX_URL_FETCH]
+    except Exception as exc:  # noqa: BLE001
+        print(f"warn: GitHub API/raw failed ({exc})", file=sys.stderr)
+    # Last try: common README paths on raw.githubusercontent.com
+    for branch in ("main", "master"):
+        for readme in ("README.md", "Readme.md", "readme.md"):
+            try:
+                raw_url = f"https://raw.githubusercontent.com/{owner}/{repo}/{branch}/{readme}"
+                raw, _ = _http_get(raw_url, accept="text/plain,*/*")
                 text = raw.decode("utf-8", errors="replace")
-                text = re.sub(r"(?is)<script[^>]*>.*?</script>", " ", text)
-                text = re.sub(r"(?is)<style[^>]*>.*?</style>", " ", text)
-                text = re.sub(r"(?s)<[^>]+>", " ", text)
                 text = re.sub(r"\s+", " ", text).strip()
-            else:
-                text = raw.decode("utf-8", errors="replace")
-                text = re.sub(r"\s+", " ", text).strip()
-            return text[:MAX_URL_SNIPPET] if text else None
+                if len(text) > 80:
+                    return text[:MAX_URL_FETCH]
+            except Exception:
+                continue
+    return None
+
+
+def fetch_url_text(url: str, timeout: float = 15.0) -> str | None:
+    """Resolve proposal links: X/Twitter, GitHub, then generic web HTML/text."""
+    if not url or not re.match(r"^https?://", url, re.I):
+        return None
+    url = url.strip()
+
+    if re.search(r"(?:twitter|x)\.com/", url, re.I):
+        got = fetch_x_status(url)
+        if got:
+            return got
+        # fall through to HTML attempt
+
+    if re.search(r"github\.com/", url, re.I):
+        got = fetch_github_text(url)
+        if got:
+            return got
+
+    try:
+        raw, ctype = _http_get(url, timeout=timeout)
+        if "json" in ctype:
+            try:
+                data = json.loads(raw.decode("utf-8", errors="replace"))
+                return json.dumps(data, ensure_ascii=False)[:MAX_URL_FETCH]
+            except json.JSONDecodeError:
+                pass
+        text = raw.decode("utf-8", errors="replace")
+        if "html" in ctype or "<html" in text[:500].lower() or b"<" in raw[:200]:
+            text = _strip_html(text)
+        else:
+            text = re.sub(r"\s+", " ", text).strip()
+        return text[:MAX_URL_FETCH] if text else None
     except Exception as exc:  # noqa: BLE001 — best-effort fetch
         print(f"warn: could not fetch URL ({exc})", file=sys.stderr)
         return None
@@ -350,8 +523,16 @@ def stage_novelty(
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--proposal", required=True, help="Proposed use-case text")
-    ap.add_argument("--source-url", default="", help="Optional source URL")
+    ap.add_argument(
+        "--proposal",
+        default="",
+        help="Optional note (may be empty when --source-url is set)",
+    )
+    ap.add_argument(
+        "--source-url",
+        default="",
+        help="Primary link to resolve (X, GitHub, web)",
+    )
     ap.add_argument(
         "--inventory",
         type=Path,
@@ -366,9 +547,16 @@ def main() -> int:
         print("error: TYPESAFE_API_KEY is not set", file=sys.stderr)
         return 1
 
-    proposal = args.proposal.strip()
-    if not proposal:
-        print("error: empty proposal", file=sys.stderr)
+    note = (args.proposal or "").strip()
+    source_url = (args.source_url or "").strip() or None
+
+    # Bare URL pasted as the note → treat as source_url
+    if not source_url and re.match(r"^https?://\S+$", note, re.I):
+        source_url = note
+        note = ""
+
+    if not note and not source_url:
+        print("error: provide a source URL and/or a short note", file=sys.stderr)
         return 1
 
     if not args.inventory.is_file():
@@ -379,9 +567,19 @@ def main() -> int:
     n_leaves = len(existing)
     sat, noul_threshold, score_threshold = thresholds_for(n_leaves)
 
-    source_url = (args.source_url or "").strip() or None
     url_text = fetch_url_text(source_url) if source_url else None
+    if source_url and not url_text:
+        print(f"error: could not resolve content from URL: {source_url}", file=sys.stderr)
+        return 1
+
     url_snippet = url_text[:MAX_URL_SNIPPET] if url_text else None
+
+    if note and url_text:
+        proposal = f"{note}\n\n--- resolved from {source_url} ---\n{url_text}"
+    elif url_text:
+        proposal = f"Use case proposed via link {source_url}:\n\n{url_text}"
+    else:
+        proposal = note
 
     # --- Stage 1: pillar route ---
     pillar_result, pillar_state, pillar_chars = stage_pillar_route(
@@ -470,8 +668,10 @@ def main() -> int:
         "base_score_threshold": BASE_SCORE_THRESHOLD,
         "overlap_force_dup_confidence": OVERLAP_FORCE_DUP_CONF,
         "proposal": proposal,
+        "note": note,
         "source_url": source_url,
         "fetched_url": bool(url_text),
+        "fetched_chars": len(url_text or ""),
         "state_chars": {
             "pillar_route": pillar_chars,
             "novelty": novelty_chars,

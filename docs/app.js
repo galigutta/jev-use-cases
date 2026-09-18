@@ -108,13 +108,22 @@
     return cut;
   };
 
+  const looksLikeUrl = (s) => {
+    try {
+      const u = new URL(s);
+      return /^https?:$/i.test(u.protocol);
+    } catch {
+      return false;
+    }
+  };
+
   const buildIssueBody = (description, url) => {
-    const parts = [
-      "### Description",
-      "",
-      description.trim(),
-      "",
-    ];
+    const parts = [];
+    if (description.trim()) {
+      parts.push("### Description", "", description.trim(), "");
+    } else {
+      parts.push("### Description", "", "_Link-only proposal — resolve content from Source URL._", "");
+    }
     if (url) {
       parts.push("### Source URL", "", url.trim(), "");
     }
@@ -128,53 +137,53 @@
     return parts.join("\n");
   };
 
+  const showReady = (msgHtml) => {
+    if (!proposeStatus) return;
+    proposeStatus.classList.add("is-ready");
+    let ready = proposeStatus.querySelector(".propose__ready");
+    if (!ready) {
+      ready = document.createElement("p");
+      ready.className = "propose__ready";
+      proposeStatus.prepend(ready);
+    }
+    ready.innerHTML = msgHtml;
+  };
+
   proposeForm?.addEventListener("submit", (e) => {
     e.preventDefault();
     const textEl = document.getElementById("propose-text");
     const urlEl = document.getElementById("propose-url");
-    const description = (textEl?.value || "").trim();
-    const url = (urlEl?.value || "").trim();
-    if (!description) {
-      textEl?.focus();
-      return;
-    }
-    if (url) {
-      try {
-        // Validate absolute http(s) URL when provided
-        const u = new URL(url);
-        if (!/^https?:$/i.test(u.protocol)) throw new Error("bad protocol");
-      } catch {
-        urlEl?.focus();
-        if (proposeStatus) {
-          proposeStatus.classList.add("is-ready");
-          let ready = proposeStatus.querySelector(".propose__ready");
-          if (!ready) {
-            ready = document.createElement("p");
-            ready.className = "propose__ready";
-            proposeStatus.prepend(ready);
-          }
-          ready.textContent = "Source URL must be a valid http(s) link (or leave it blank).";
-        }
-        return;
-      }
+    let description = (textEl?.value || "").trim();
+    let url = (urlEl?.value || "").trim();
+
+    // Note field is a bare URL and link empty → treat as link
+    if (!url && looksLikeUrl(description)) {
+      url = description;
+      description = "";
     }
 
-    const title = `[propose] ${shortTitle(description)}`;
+    if (!url && !description) {
+      urlEl?.focus();
+      showReady("Paste a link (or a short note).");
+      return;
+    }
+    if (url && !looksLikeUrl(url)) {
+      urlEl?.focus();
+      showReady("Link must be a valid http(s) URL.");
+      return;
+    }
+
+    const titleSeed = description || url || "use case";
+    const title = `[propose] ${shortTitle(titleSeed)}`;
     const body = buildIssueBody(description, url);
     const params = new URLSearchParams({ title, body, labels: "propose" });
     const href = `${ISSUES_NEW}?${params.toString()}`;
 
-    if (proposeStatus) {
-      proposeStatus.classList.add("is-ready");
-      let ready = proposeStatus.querySelector(".propose__ready");
-      if (!ready) {
-        ready = document.createElement("p");
-        ready.className = "propose__ready";
-        proposeStatus.prepend(ready);
-      }
-      ready.innerHTML =
-        "Opening GitHub with your proposal. After the issue is created, the Action will grade with Jev; if novel, Codex opens a PR. Track progress on <a href=\"https://github.com/galigutta/jev-use-cases/actions\" rel=\"noopener\">Actions</a>.";
-    }
+    showReady(
+      url
+        ? "Opening GitHub… we’ll fetch that link, grade it with Jev, and auto-merge if it’s new."
+        : "Opening GitHub… Jev will grade your note and auto-merge if it’s new."
+    );
 
     window.open(href, "_blank", "noopener");
   });
