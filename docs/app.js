@@ -131,6 +131,77 @@
   const escapeText = (s) =>
     String(s)
       .replace(/&/g, "&amp;")
+
+
+  const fmtNum = (n, digits = 2) => {
+    const x = Number(n);
+    if (!Number.isFinite(x)) return "—";
+    return x.toFixed(digits);
+  };
+
+  const passFail = (ok) =>
+    ok ? `<span class="propose__gate propose__gate--pass">pass</span>` : `<span class="propose__gate propose__gate--fail">fail</span>`;
+
+  const renderGradeMetrics = (data) => {
+    const noul = data.noul;
+    const noulThr = data.noul_threshold;
+    const score = data.novelty_score;
+    const scoreThr = data.score_threshold;
+    const gates = data.gates || {};
+    const rows = [];
+    if (data.pillar) {
+      rows.push(
+        `<div class="propose__metric"><span class="propose__metric-k">Pillar</span><span class="propose__metric-v"><em>${escapeText(data.pillar)}</em>` +
+          (data.pillar_confidence != null
+            ? ` <code>${fmtNum(data.pillar_confidence)}</code>`
+            : "") +
+          `</span></div>`,
+      );
+    }
+    if (noul != null || noulThr != null) {
+      rows.push(
+        `<div class="propose__metric"><span class="propose__metric-k">is_novel <span class="propose__metric-sub">noul</span></span><span class="propose__metric-v"><code>${fmtNum(noul)}</code> <span class="propose__metric-sub">≥ ${fmtNum(noulThr)}</span> ${passFail(gates.noul_pass ?? noul >= noulThr)}</span></div>`,
+      );
+    }
+    if (score != null || scoreThr != null) {
+      rows.push(
+        `<div class="propose__metric"><span class="propose__metric-k">novelty_score</span><span class="propose__metric-v"><code>${fmtNum(score, 1)}</code> <span class="propose__metric-sub">≥ ${fmtNum(scoreThr, 1)}</span> ${passFail(gates.score_pass ?? score >= scoreThr)}</span></div>`,
+      );
+    }
+    const overlapLabel = data.overlap_text || data.overlap || "";
+    if (overlapLabel && overlapLabel !== "none") {
+      rows.push(
+        `<div class="propose__metric propose__metric--wide"><span class="propose__metric-k">Closest overlap</span><span class="propose__metric-v"><em>${escapeText(overlapLabel)}</em>` +
+          (data.overlap_confidence != null
+            ? ` <code>${fmtNum(data.overlap_confidence)}</code>`
+            : "") +
+          ` ${passFail(gates.overlap_ok !== false)}</span></div>`,
+      );
+    } else if (data.overlap === "none") {
+      rows.push(
+        `<div class="propose__metric propose__metric--wide"><span class="propose__metric-k">Closest overlap</span><span class="propose__metric-v"><em>none</em> ${passFail(true)}</span></div>`,
+      );
+    }
+    if (data.n_leaves != null || data.sat != null) {
+      rows.push(
+        `<div class="propose__metric propose__metric--wide"><span class="propose__metric-k">Catalog</span><span class="propose__metric-v"><code>${escapeText(String(data.n_leaves ?? "—"))}</code> leaves · sat <code>${fmtNum(data.sat)}</code></span></div>`,
+      );
+    }
+    if (!rows.length) return "";
+    return `<div class="propose__metrics" role="group" aria-label="Jev grade">${rows.join("")}</div>`;
+  };
+
+  const whyLine = (data) => {
+    const why = Array.isArray(data.why) ? data.why : [];
+    if (!why.length) return "";
+    const labels = {
+      noul_below_threshold: "noul below bar",
+      score_below_threshold: "novelty score below bar",
+      overlap_force_duplicate: "overlap forced duplicate",
+    };
+    return `<p class="propose__why">Held back by: ${why.map((w) => labels[w] || escapeText(w)).join(" · ")}</p>`;
+  };
+
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;");
@@ -318,24 +389,19 @@
       // Worker grades with Jev in-request. Duplicates never create a GitHub issue.
       if (data.verdict === "novel" || data.novel === true) {
         const detail = data.html_url
-          ? ` <a href="${data.html_url}" rel="noopener">See details</a>`
-          : ` <a href="https://github.com/galigutta/jev-use-cases/pulls" rel="noopener">Watch PRs</a>`;
+          ? `<a href="${data.html_url}" rel="noopener">See details</a>`
+          : `<a href="https://github.com/galigutta/jev-use-cases/pulls" rel="noopener">Watch PRs</a>`;
         setLive(
           "ok",
-          `<strong>Accepted</strong> — new` +
-            (data.pillar ? ` under <em>${escapeText(data.pillar)}</em>` : "") +
-            `. A leaf is writing now and will <strong>auto-merge</strong> in a couple of minutes. Refresh the map after merge.` +
-            detail,
+          `<p class="propose__headline"><strong>Accepted</strong> — new under the map. A leaf is writing now and will <strong>auto-merge</strong> in a couple of minutes. Refresh after merge. ${detail}</p>` +
+            renderGradeMetrics(data),
         );
       } else if (data.verdict === "duplicate" || data.novel === false) {
-        const overlap = data.overlap_text || data.overlap || "";
         setLive(
           "dup",
-          `<strong>Already on the map</strong>` +
-            (overlap && overlap !== "none"
-              ? `. Closest leaf: <em>${escapeText(overlap)}</em>`
-              : "") +
-            `. Nothing was filed.`,
+          `<p class="propose__headline"><strong>Already on the map</strong> — nothing was filed.</p>` +
+            renderGradeMetrics(data) +
+            whyLine(data),
         );
       } else if (data.number && data.html_url) {
         startWatching({ number: data.number, html_url: data.html_url });

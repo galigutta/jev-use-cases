@@ -784,3 +784,69 @@ a:focus-visible {
 .propose__live[data-state="info"] {
   border-color: var(--line);
 }
+
+.propose__headline {
+  margin: 0 0 0.65rem;
+}
+.propose__metrics {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.4rem 0.75rem;
+  margin: 0;
+}
+@media (min-width: 520px) {
+  .propose__metrics {
+    grid-template-columns: 1fr 1fr;
+  }
+  .propose__metric--wide { grid-column: 1 / -1; }
+}
+.propose__metric {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.45rem 0.55rem;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+.propose__metric-k {
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+.propose__metric-sub {
+  text-transform: none;
+  letter-spacing: 0;
+  opacity: 0.85;
+  font-size: 0.78rem;
+}
+.propose__metric-v {
+  font-size: 0.86rem;
+  line-height: 1.35;
+  color: var(--ink);
+}
+.propose__gate {
+  display: inline-block;
+  margin-left: 0.25rem;
+  padding: 0.05rem 0.35rem;
+  border-radius: 999px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  vertical-align: middle;
+}
+.propose__gate--pass {
+  color: var(--workflow);
+  background: color-mix(in srgb, var(--workflow) 18%, transparent);
+}
+.propose__gate--fail {
+  color: var(--voice);
+  background: color-mix(in srgb, var(--voice) 18%, transparent);
+}
+.propose__why {
+  margin: 0.65rem 0 0;
+  font-size: 0.8rem;
+  color: var(--ink-dim);
+}

@@ -312,8 +312,10 @@ async function grade(apiKey, note, sourceUrl, urlText, existing) {
       criteria: { ...PILLAR_CRITERIA },
     },
   });
-  const pillarChoice = pillarResult?.answers?.pillar?.choice;
+  const pillarAns = pillarResult?.answers?.pillar || {};
+  const pillarChoice = pillarAns.choice;
   const pillar = PILLARS.includes(pillarChoice) ? pillarChoice : "workflow";
+  const pillarConfidence = pillarAns.confidence != null ? Number(pillarAns.confidence) : null;
 
   // Stage 2 — pack + novelty
   let peers = existing
@@ -458,10 +460,21 @@ async function grade(apiKey, note, sourceUrl, urlText, existing) {
   const overlapOk = overlapChoice === "none" || overlapConf < OVERLAP_FORCE_DUP;
   const novel = noul >= noulThr && noveltyScore >= scoreThr && overlapOk && !overlapForcesDup;
 
+  const gates = {
+    noul_pass: noul >= noulThr,
+    score_pass: noveltyScore >= scoreThr,
+    overlap_ok: overlapOk && !overlapForcesDup,
+  };
+  const why = [];
+  if (!gates.noul_pass) why.push("noul_below_threshold");
+  if (!gates.score_pass) why.push("score_below_threshold");
+  if (!gates.overlap_ok) why.push("overlap_force_duplicate");
+
   return {
     novel,
     verdict: novel ? "novel" : "duplicate",
     pillar,
+    pillar_confidence: pillarConfidence,
     noul,
     novelty_score: noveltyScore,
     noul_threshold: noulThr,
@@ -471,6 +484,8 @@ async function grade(apiKey, note, sourceUrl, urlText, existing) {
     overlap: overlapChoice,
     overlap_text: overlapText,
     overlap_confidence: overlapConf,
+    gates,
+    why: novel ? [] : why,
     pillar_chars: pillarChars,
     novelty_chars: chars,
     proposal,
@@ -569,30 +584,11 @@ export default {
       return json({ error: `Jev grade failed: ${String(err.message || err).slice(0, 200)}` }, 502);
     }
 
-    // Duplicates: verdict only — no GitHub issue, no Actions.
-    if (!gradeResult.novel) {
-      return json({
-        novel: false,
-        verdict: "duplicate",
-        pillar: gradeResult.pillar,
-        overlap: gradeResult.overlap,
-        overlap_text: gradeResult.overlap_text,
-        noul: gradeResult.noul,
-        novelty_score: gradeResult.novelty_score,
-        noul_threshold: gradeResult.noul_threshold,
-        score_threshold: gradeResult.score_threshold,
-        issue: null,
-      });
-    }
-
-    // Novel: pass Worker verdict downstream via repository_dispatch (skip re-grade in Actions).
-    const dispatchPayload = {
-      proposal: gradeResult.proposal,
-      source_url: url || "",
-      note: note || "",
-      novel: true,
-      verdict: "novel",
+    const publicGrade = {
+      novel: gradeResult.novel,
+      verdict: gradeResult.verdict,
       pillar: gradeResult.pillar,
+      pillar_confidence: gradeResult.pillar_confidence,
       noul: gradeResult.noul,
       novelty_score: gradeResult.novelty_score,
       noul_threshold: gradeResult.noul_threshold,
@@ -601,6 +597,22 @@ export default {
       n_leaves: gradeResult.n_leaves,
       overlap: gradeResult.overlap,
       overlap_text: gradeResult.overlap_text,
+      overlap_confidence: gradeResult.overlap_confidence,
+      gates: gradeResult.gates,
+      why: gradeResult.why,
+    };
+
+    // Duplicates: verdict only — no GitHub issue, no Actions.
+    if (!gradeResult.novel) {
+      return json({ ...publicGrade, issue: null, dispatched: false });
+    }
+
+    // Novel: pass Worker verdict downstream via repository_dispatch (skip re-grade in Actions).
+    const dispatchPayload = {
+      ...publicGrade,
+      proposal: gradeResult.proposal,
+      source_url: url || "",
+      note: note || "",
       graded_by: "propose-api",
     };
 
@@ -629,15 +641,7 @@ export default {
     }
 
     return json({
-      novel: true,
-      verdict: "novel",
-      pillar: gradeResult.pillar,
-      overlap: gradeResult.overlap,
-      overlap_text: gradeResult.overlap_text,
-      noul: gradeResult.noul,
-      novelty_score: gradeResult.novelty_score,
-      noul_threshold: gradeResult.noul_threshold,
-      score_threshold: gradeResult.score_threshold,
+      ...publicGrade,
       dispatched: true,
       issue: null,
     });
