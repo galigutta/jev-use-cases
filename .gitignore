@@ -1,7 +1,9 @@
 
 __pycache__/
 *.pyc
-use_cases.json
+# use_cases.json  (Actions workspace artifact)
+/use_cases.json
+!docs/use_cases.json
 novelty.json
 codex-prompt.md
 proposal.txt

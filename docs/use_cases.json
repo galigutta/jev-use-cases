@@ -1,0 +1,506 @@
+{
+  "count": 40,
+  "pillars": [
+    "workflow",
+    "bulk",
+    "realtime",
+    "verify",
+    "harness",
+    "voice"
+  ],
+  "use_cases": [
+    {
+      "pillar": "workflow",
+      "text": "Support triage — dept, urgency, frustration, refund, policy fit",
+      "links": [
+        {
+          "text": "Vercel example",
+          "href": "https://vercel.com/changelog/typesafe-ai-jev-now-available-on-ai-gateway"
+        },
+        {
+          "text": "docs map",
+          "href": "https://docs.typesafe.ai/concepts/use-case-map"
+        }
+      ]
+    },
+    {
+      "pillar": "workflow",
+      "text": "Lead / ICP qualification · Insurance FNOL · FinCrime / KYC · Legal compliance flags",
+      "links": [
+        {
+          "text": "use-case map",
+          "href": "https://docs.typesafe.ai/concepts/use-case-map"
+        }
+      ]
+    },
+    {
+      "pillar": "workflow",
+      "text": "E-com listing normalize, returns auto-approve, PR/alert ownership",
+      "links": [
+        {
+          "text": "docs",
+          "href": "https://docs.typesafe.ai/concepts/use-case-map"
+        }
+      ]
+    },
+    {
+      "pillar": "workflow",
+      "text": "Home Assistant automations",
+      "links": [
+        {
+          "text": "AboveColin/HA-Jev",
+          "href": "https://github.com/AboveColin/HA-Jev"
+        }
+      ]
+    },
+    {
+      "pillar": "workflow",
+      "text": "Canonical framing",
+      "links": [
+        {
+          "text": "launch blog",
+          "href": "https://typesafe.ai/blog/introducing-system-one-models-and-jev"
+        },
+        {
+          "text": "Valyu guide",
+          "href": "https://dev.to/valyuai/how-to-use-jev-a-practical-guide-to-typesafes-system-one-model-g5e"
+        }
+      ]
+    },
+    {
+      "pillar": "bulk",
+      "text": "Paper topic classification — 1,018 × 24 topics ≈ $0.08",
+      "links": [
+        {
+          "text": "1kpapers.com",
+          "href": "https://1kpapers.com"
+        },
+        {
+          "text": "Valyu (Hassan El Mghari)",
+          "href": "https://dev.to/valyuai/how-to-use-jev-a-practical-guide-to-typesafes-system-one-model-g5e"
+        }
+      ]
+    },
+    {
+      "pillar": "bulk",
+      "text": "SEC / taxonomy collapse, survey coding, CMS tagging, log clustering",
+      "links": [
+        {
+          "text": "confidence taxonomy cookbook",
+          "href": "https://docs.typesafe.ai/cookbooks/classification_using_confidence"
+        }
+      ]
+    },
+    {
+      "pillar": "bulk",
+      "text": "Autoresearch feature discovery → classical ML",
+      "links": [
+        {
+          "text": "cookbook",
+          "href": "https://docs.typesafe.ai/cookbooks/autoresearch_feature_discovery"
+        }
+      ]
+    },
+    {
+      "pillar": "bulk",
+      "text": "Crowdcheck — 10k synthetic personas",
+      "links": [
+        {
+          "text": "live demo",
+          "href": "https://crowdcheck-ai.vercel.app/"
+        }
+      ]
+    },
+    {
+      "pillar": "bulk",
+      "text": "Map-reduce thesis",
+      "links": [
+        {
+          "text": "TypeSafe launch",
+          "href": "https://typesafe.ai/blog/introducing-system-one-models-and-jev"
+        }
+      ]
+    },
+    {
+      "pillar": "realtime",
+      "text": "Doom @ ~10 Hz · ~$7/hr",
+      "links": [
+        {
+          "text": "launch demo",
+          "href": "https://typesafe.ai/blog/introducing-system-one-models-and-jev"
+        },
+        {
+          "text": "@CompleteSkeptic",
+          "href": "https://x.com/CompleteSkeptic"
+        }
+      ]
+    },
+    {
+      "pillar": "realtime",
+      "text": "Wikiracing — high-cardinality links",
+      "links": [
+        {
+          "text": "launch demo",
+          "href": "https://typesafe.ai/blog/introducing-system-one-models-and-jev"
+        }
+      ]
+    },
+    {
+      "pillar": "realtime",
+      "text": "Subway Surfers × 50 parallel",
+      "links": [
+        {
+          "text": "@_MaxBlade",
+          "href": "https://x.com/_MaxBlade"
+        },
+        {
+          "text": "@kkurilyak",
+          "href": "https://x.com/kkurilyak"
+        }
+      ]
+    },
+    {
+      "pillar": "realtime",
+      "text": "Super Mario from emulator RAM",
+      "links": [
+        {
+          "text": "fhshaik/typesafe-mario",
+          "href": "https://github.com/fhshaik/typesafe-mario"
+        }
+      ]
+    },
+    {
+      "pillar": "realtime",
+      "text": "StarCraft shareware (421 decisions)",
+      "links": [
+        {
+          "text": "phyous/tsai-sc",
+          "href": "https://github.com/phyous/tsai-sc"
+        }
+      ]
+    },
+    {
+      "pillar": "realtime",
+      "text": "HEIST//ONE stealth game",
+      "links": [
+        {
+          "text": "AbdelStark/heist-one",
+          "href": "https://github.com/AbdelStark/heist-one"
+        }
+      ]
+    },
+    {
+      "pillar": "realtime",
+      "text": "Browser Use / Jev Ultrafast — ZRH→LON ~7.1s / ~$0.0039",
+      "links": [
+        {
+          "text": "browser-use/jev-ultrafast",
+          "href": "https://github.com/browser-use/jev-ultrafast"
+        },
+        {
+          "text": "@gregpr07",
+          "href": "https://x.com/gregpr07/status/2100411066966749359"
+        }
+      ]
+    },
+    {
+      "pillar": "realtime",
+      "text": "Desktop computer-use",
+      "links": [
+        {
+          "text": "awlevin/typesafe-computer-use",
+          "href": "https://github.com/awlevin/typesafe-computer-use"
+        },
+        {
+          "text": "trycua/cua",
+          "href": "https://github.com/trycua/cua"
+        },
+        {
+          "text": "@ValencianaAbel",
+          "href": "https://x.com/ValencianaAbel"
+        }
+      ]
+    },
+    {
+      "pillar": "realtime",
+      "text": "Android UI agent",
+      "links": [
+        {
+          "text": "Friedjof/jev-mobile",
+          "href": "https://github.com/Friedjof/jev-mobile"
+        }
+      ]
+    },
+    {
+      "pillar": "realtime",
+      "text": "Drone tactical judgment ~2.5 Hz",
+      "links": [
+        {
+          "text": "RomanSlack/jev-drone",
+          "href": "https://github.com/RomanSlack/jev-drone"
+        }
+      ]
+    },
+    {
+      "pillar": "realtime",
+      "text": "Market making — Monad/Kuru",
+      "links": [
+        {
+          "text": "jarrodwatts/jev-trader",
+          "href": "https://github.com/jarrodwatts/jev-trader"
+        },
+        {
+          "text": "@jarrodwatts",
+          "href": "https://x.com/jarrodwatts"
+        }
+      ]
+    },
+    {
+      "pillar": "realtime",
+      "text": "Typewriter live demo",
+      "links": [
+        {
+          "text": "typesafe-demo.val.run",
+          "href": "https://typesafe-demo.val.run/"
+        },
+        {
+          "text": "@stevekrouse",
+          "href": "https://x.com/stevekrouse/status/2100287368221659289"
+        }
+      ]
+    },
+    {
+      "pillar": "verify",
+      "text": "Jailbreak / prompt-injection · citation groundedness",
+      "links": [
+        {
+          "text": "llm_guardrails",
+          "href": "https://docs.typesafe.ai/cookbooks/llm_guardrails"
+        },
+        {
+          "text": "citation_check",
+          "href": "https://docs.typesafe.ai/cookbooks/citation_check"
+        }
+      ]
+    },
+    {
+      "pillar": "verify",
+      "text": "RAG passage classify / contradiction",
+      "links": [
+        {
+          "text": "cookbook",
+          "href": "https://docs.typesafe.ai/cookbooks/classifying_rag_passages"
+        }
+      ]
+    },
+    {
+      "pillar": "verify",
+      "text": "Staged code review",
+      "links": [
+        {
+          "text": "devagrawal09/jev-review",
+          "href": "https://github.com/devagrawal09/jev-review"
+        }
+      ]
+    },
+    {
+      "pillar": "verify",
+      "text": "Policy / loop / tool gates",
+      "links": [
+        {
+          "text": "bicameral",
+          "href": "https://github.com/AbdelStark/bicameral"
+        },
+        {
+          "text": "pi-warden",
+          "href": "https://github.com/DevMortimer/pi-warden"
+        },
+        {
+          "text": "jev-axi",
+          "href": "https://github.com/shiftynick/jev-axi"
+        }
+      ]
+    },
+    {
+      "pillar": "verify",
+      "text": "“Verify everything” thesis",
+      "links": [
+        {
+          "text": "launch blog",
+          "href": "https://typesafe.ai/blog/introducing-system-one-models-and-jev"
+        },
+        {
+          "text": "Vercel",
+          "href": "https://vercel.com/changelog/typesafe-ai-jev-now-available-on-ai-gateway"
+        }
+      ]
+    },
+    {
+      "pillar": "harness",
+      "text": "Next tool / subagent · continue / retry / ask / stop",
+      "links": [
+        {
+          "text": "Vercel",
+          "href": "https://vercel.com/changelog/typesafe-ai-jev-now-available-on-ai-gateway"
+        },
+        {
+          "text": "@marumarucanada",
+          "href": "https://x.com/marumarucanada"
+        }
+      ]
+    },
+    {
+      "pillar": "harness",
+      "text": "Model / specialist router",
+      "links": [
+        {
+          "text": "model routing",
+          "href": "https://docs.typesafe.ai/concepts/use-case-map"
+        },
+        {
+          "text": "@talltalebro",
+          "href": "https://x.com/talltalebro"
+        }
+      ]
+    },
+    {
+      "pillar": "harness",
+      "text": "Skill suggestion over large catalogs",
+      "links": [
+        {
+          "text": "cookbook",
+          "href": "https://docs.typesafe.ai/cookbooks/skill_suggestion"
+        },
+        {
+          "text": "typesafe-ai/skills",
+          "href": "https://github.com/typesafe-ai/skills"
+        }
+      ]
+    },
+    {
+      "pillar": "harness",
+      "text": "Context reduction Claude Code plugin",
+      "links": [
+        {
+          "text": "BorisLeMeec/jev",
+          "href": "https://github.com/BorisLeMeec/jev"
+        },
+        {
+          "text": "@ZeBoris_",
+          "href": "https://x.com/ZeBoris_"
+        }
+      ]
+    },
+    {
+      "pillar": "harness",
+      "text": "MAGI majority vote",
+      "links": [
+        {
+          "text": "hide-G/magi-system-on-jev",
+          "href": "https://github.com/hide-G/magi-system-on-jev"
+        },
+        {
+          "text": "@nagata_hideyuki",
+          "href": "https://x.com/nagata_hideyuki"
+        }
+      ]
+    },
+    {
+      "pillar": "harness",
+      "text": "rtrvr.ai browser agents",
+      "links": [
+        {
+          "text": "rtrvr.ai",
+          "href": "https://rtrvr.ai"
+        },
+        {
+          "text": "@b_kalisetty",
+          "href": "https://x.com/b_kalisetty"
+        }
+      ]
+    },
+    {
+      "pillar": "harness",
+      "text": "Gateways",
+      "links": [
+        {
+          "text": "@CloudflareDev",
+          "href": "https://x.com/CloudflareDev"
+        },
+        {
+          "text": "Vercel AI Gateway",
+          "href": "https://vercel.com/ai-gateway/models/jev"
+        }
+      ]
+    },
+    {
+      "pillar": "harness",
+      "text": "Ecosystem index",
+      "links": [
+        {
+          "text": "AbdelStark/awesome-typesafe",
+          "href": "https://github.com/AbdelStark/awesome-typesafe"
+        }
+      ]
+    },
+    {
+      "pillar": "voice",
+      "text": "Voice-driven computer use — ASR / dialogue state → click, type, scroll Choice (ears instead of pixels)",
+      "links": [
+        {
+          "text": "Browser Use",
+          "href": "https://github.com/browser-use/jev-ultrafast"
+        },
+        {
+          "text": "Cua",
+          "href": "https://github.com/trycua/cua"
+        },
+        {
+          "text": "computer-use",
+          "href": "https://github.com/awlevin/typesafe-computer-use"
+        }
+      ]
+    },
+    {
+      "pillar": "voice",
+      "text": "Secondary turn / end-of-utterance detect — Noul bolted onto an aggressive VAD or primary turn model",
+      "links": [],
+      "blurb": "Conceptual System One leaf (not a public Jev demo yet): stream VAD / primary EOU probabilities into state; ask a Noul like “has the user finished their turn?” and only then commit ASR→LLM. Cheap second opinion before the stack spends a frontier call."
+    },
+    {
+      "pillar": "voice",
+      "text": "Speak-up gate — should the bot interrupt / reply, with or without a wake word",
+      "links": [
+        {
+          "text": "confidence routing",
+          "href": "https://docs.typesafe.ai/patterns/confidence-routing"
+        }
+      ],
+      "blurb": "Conceptual System One leaf: Choice or Noul over stay silent / acknowledge / full reply, gated on confidence. Wake word optional — calibrated confidence is the gate. Pairs with confidence-routing patterns in TypeSafe docs."
+    },
+    {
+      "pillar": "voice",
+      "text": "Group / multi-party bot — same gate unlocks a bot in a roomful of people",
+      "links": [],
+      "blurb": "Extension of the speak-up gate: in multi-speaker audio, decide whether this utterance is for the bot, whether interrupting helps, and whether to stay silent. Without it you need a wake word or you thrash the room."
+    },
+    {
+      "pillar": "voice",
+      "text": "Adjacent building blocks",
+      "links": [
+        {
+          "text": "jev-ultrafast",
+          "href": "https://github.com/browser-use/jev-ultrafast"
+        },
+        {
+          "text": "confidence routing",
+          "href": "https://docs.typesafe.ai/patterns/confidence-routing"
+        },
+        {
+          "text": "launch thesis",
+          "href": "https://typesafe.ai/blog/introducing-system-one-models-and-jev"
+        }
+      ]
+    }
+  ]
+}
