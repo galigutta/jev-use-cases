@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Jev · MECE Use-Case Map</title>
+  <meta name="description" content="An inspired MECE map of TypeSafe Jev use cases from the first days on X — smart workflows, bulk judgment, real-time loops, verification, and agent harnesses." />
+  <meta name="theme-color" content="#07080c" />
+  <meta property="og:title" content="Jev · MECE Use-Case Map" />
+  <meta property="og:description" content="State in. Typed decision out. Five pillars. Everything people are building with TypeSafe's System One model." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://galigutta.github.io/jev-use-cases/" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Jev · MECE Use-Case Map" />
+  <meta name="twitter:description" content="The taxonomy of what Jev is for — from X, demos, and the first 48 hours." />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2307080c'/%3E%3Ccircle cx='16' cy='16' r='5' fill='%23f4f1ea'/%3E%3Cpath d='M16 3v5M16 24v5M3 16h5M24 16h5M7 7l3.5 3.5M21.5 21.5L25 25M7 25l3.5-3.5M21.5 10.5L25 7' stroke='%2378e8c8' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <a class="skip" href="#taxonomy">Skip to taxonomy</a>
+
+  <header class="top">
+    <div class="top__inner">
+      <a class="mark" href="#top" aria-label="Jev map home">
+        <span class="mark__orb" aria-hidden="true"></span>
+        <span class="mark__text">Jev map</span>
+      </a>
+      <nav class="top__nav" aria-label="Page">
+        <a href="#taxonomy">Taxonomy</a>
+        <a href="#patterns">Patterns</a>
+        <a href="#limits">Limits</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <p class="eyebrow">Independent · first 48 hours on X · Sep 2026</p>
+      <h1>
+        <span class="hero__serif">State in.</span>
+        <span class="hero__decision">Typed decision out.</span>
+      </h1>
+      <p class="hero__lede">
+        Jev doesn’t chat. It is frontier judgment as a function call —
+        Choice, Score, Noul, confidence — and people are rewriting their agent stacks around it.
+        This page is the <em>MECE map</em> of what they’re actually building.
+      </p>
+
+      <div class="switchboard" aria-label="Five MECE pillars">
+        <div class="switchboard__core">
+          <span class="switchboard__label">Jev</span>
+          <span class="switchboard__sub">System One</span>
+        </div>
+        <a class="cable cable--1" href="#pillar-workflow" data-pillar="workflow">
+          <span class="cable__num">01</span>
+          <span class="cable__name">Workflow</span>
+        </a>
+        <a class="cable cable--2" href="#pillar-bulk" data-pillar="bulk">
+          <span class="cable__num">02</span>
+          <span class="cable__name">Bulk</span>
+        </a>
+        <a class="cable cable--3" href="#pillar-realtime" data-pillar="realtime">
+          <span class="cable__num">03</span>
+          <span class="cable__name">Realtime</span>
+        </a>
+        <a class="cable cable--4" href="#pillar-verify" data-pillar="verify">
+          <span class="cable__num">04</span>
+          <span class="cable__name">Verify</span>
+        </a>
+        <a class="cable cable--5" href="#pillar-harness" data-pillar="harness">
+          <span class="cable__num">05</span>
+          <span class="cable__name">Harness</span>
+        </a>
+      </div>
+
+      <p class="hero__footnote">
+        Mutually exclusive pillars · collectively exhaustive for decision-shaped work · not affiliated with TypeSafe AI
+      </p>
+    </section>
+
+    <section id="taxonomy" class="taxonomy">
+      <div class="taxonomy__head">
+        <h2>The taxonomy</h2>
+        <p>Five trunks. Everything else is a leaf. Tap a pillar to open its leaves — or skim the chips below.</p>
+      </div>
+
+      <nav class="pillar-rail" aria-label="MECE pillars" id="pillar-rail">
+        <button type="button" class="rail-btn is-active" data-pillar="workflow" aria-pressed="true">
+          <span class="rail-btn__num">01</span>
+          <span class="rail-btn__label">Smart workflows</span>
+        </button>
+        <button type="button" class="rail-btn" data-pillar="bulk" aria-pressed="false">
+          <span class="rail-btn__num">02</span>
+          <span class="rail-btn__label">Bulk map-reduce</span>
+        </button>
+        <button type="button" class="rail-btn" data-pillar="realtime" aria-pressed="false">
+          <span class="rail-btn__num">03</span>
+          <span class="rail-btn__label">Realtime loops</span>
+        </button>
+        <button type="button" class="rail-btn" data-pillar="verify" aria-pressed="false">
+          <span class="rail-btn__num">04</span>
+          <span class="rail-btn__label">Verify &amp; guard</span>
+        </button>
+        <button type="button" class="rail-btn" data-pillar="harness" aria-pressed="false">
+          <span class="rail-btn__num">05</span>
+          <span class="rail-btn__label">Agent harness</span>
+        </button>
+      </nav>
+
+      <div class="pillars">
+        <article class="pillar is-open" id="pillar-workflow" data-pillar="workflow">
+          <header class="pillar__header">
+            <div class="pillar__id">
+              <span class="pillar__num">01</span>
+              <span class="pillar__tag">Smart if-statements</span>
+            </div>
+            <h3>Smart workflow decisions</h3>
+            <p>Fuzzy classify / route / score / branch inside ordinary software — where brittle rules fail and chat models are overkill.</p>
+          </header>
+          <ul class="leaves">
+            <li>Support triage — dept, urgency, frustration, refund, policy fit</li>
+            <li>Lead / ICP qualification — prospect vs spam vs applicant</li>
+            <li>Insurance FNOL — complexity, fraud signals → STP vs specialist</li>
+            <li>FinCrime / KYC — narrative risk, entity match, alert priority</li>
+            <li>Legal &amp; compliance flags — missing clauses, prohibited claims</li>
+            <li>E-com listing normalize — attributes, counterfeit, review abuse</li>
+            <li>Returns / refund auto-approve — clear → auto; ambiguous → human</li>
+            <li>PR / alert / ticket ownership — team Choice + severity Score</li>
+            <li>Onboarding article match · feature-request extraction</li>
+            <li>Inbox / newsletter sort · sponsor-form screening</li>
+            <li>Home Assistant automations <span class="src">HA-Jev</span></li>
+          </ul>
+        </article>
+
+        <article class="pillar" id="pillar-bulk" data-pillar="bulk">
+          <header class="pillar__header">
+            <div class="pillar__id">
+              <span class="pillar__num">02</span>
+              <span class="pillar__tag">$0.042 / MTok</span>
+            </div>
+            <h3>Bulk map-reduce over data</h3>
+            <p>Cheap judgment over giant corpora — the economics that make “run it on everything” suddenly rational.</p>
+          </header>
+          <ul class="leaves">
+            <li>Paper topic classification — 1,018 × 24 topics ≈ <strong>$0.08</strong> <span class="src">Hassan El Mghari</span></li>
+            <li>SEC / taxonomy collapse — low confidence → parent division</li>
+            <li>Survey &amp; transcript qualitative coding</li>
+            <li>Archive / CMS auto-tagging</li>
+            <li>Review &amp; social theme mining at volume</li>
+            <li>Log / failure clustering</li>
+            <li>Autoresearch feature discovery → classical ML</li>
+            <li>Crowdcheck — batch judgments over 10k synthetic personas</li>
+          </ul>
+        </article>
+
+        <article class="pillar" id="pillar-realtime" data-pillar="realtime">
+          <header class="pillar__header">
+            <div class="pillar__id">
+              <span class="pillar__num">03</span>
+              <span class="pillar__tag">70–500ms</span>
+            </div>
+            <h3>Realtime control loops</h3>
+            <p>Action selection at game, UI, and market clock rates — perception and safety stay in code; Jev picks the move.</p>
+          </header>
+          <ul class="leaves">
+            <li>Doom @ ~10 Hz · ~$7/hr <span class="src">@CompleteSkeptic</span></li>
+            <li>Wikiracing — high-cardinality links, no invented URLs</li>
+            <li>Subway Surfers × 50 parallel games <span class="src">@_MaxBlade</span></li>
+            <li>Super Mario from emulator RAM · StarCraft shareware (421 decisions)</li>
+            <li>HEIST//ONE — multi-guard stealth judgments</li>
+            <li>Browser Use / Jev Ultrafast — ZRH→LON Flights ~7.1s / ~$0.0039 <span class="src">@gregpr07</span></li>
+            <li>Desktop computer-use · Cua + jevuse · Android UI agent</li>
+            <li>Drone tactical judgment ~2.5 Hz (advisory only)</li>
+            <li>Market making — Monad/Kuru ~300ms blocks <span class="src">@jarrodwatts</span></li>
+            <li>Typewriter live demo — 16 judgments as you type <span class="src">@stevekrouse</span></li>
+            <li>Smart-home closed-set tool select ~300ms</li>
+          </ul>
+        </article>
+
+        <article class="pillar" id="pillar-verify" data-pillar="verify">
+          <header class="pillar__header">
+            <div class="pillar__id">
+              <span class="pillar__num">04</span>
+              <span class="pillar__tag">Universal verification</span>
+            </div>
+            <h3>Verify &amp; guardrails</h3>
+            <p>Score, judge, and gate prompts, traces, tool calls, drafts, and claims — at a fraction of the LLM call you’re protecting.</p>
+          </header>
+          <ul class="leaves">
+            <li>Jailbreak / prompt-injection detection on LLM I/O</li>
+            <li>Citation &amp; groundedness — does the passage support the claim?</li>
+            <li>Pre-send draft checks — contradiction, false refund vs account</li>
+            <li>Shell / tool-call risk — read-only vs reversible vs irreversible</li>
+            <li>Agent safety monitor — escalate suspects to a bigger model</li>
+            <li>Writing defect / style lints · semantic CI rules</li>
+            <li>Brand / pre-publish CMS checks</li>
+            <li>Ad brand-safety &amp; claim compliance</li>
+          </ul>
+        </article>
+
+        <article class="pillar" id="pillar-harness" data-pillar="harness">
+          <header class="pillar__header">
+            <div class="pillar__id">
+              <span class="pillar__num">05</span>
+              <span class="pillar__tag">L7 for agents</span>
+            </div>
+            <h3>Agent harness engineering</h3>
+            <p>Make the loop cheaper, safer, and composable — Jev as the load balancer sitting above models, tools, and humans.</p>
+          </header>
+          <ul class="leaves">
+            <li>Next tool / subagent Choice <span class="src">“L7 load balancer for agents”</span></li>
+            <li>Continue / retry / ask user / stop</li>
+            <li>Model router — intent + difficulty + risk → cheap vs frontier</li>
+            <li>Skill / MCP suggestion over large catalogs</li>
+            <li>Context reduction — Claude Code plugin ~30% tokens <span class="src">@ZeBoris_</span></li>
+            <li>Policy gates — Bicameral, pi-warden, jev-axi</li>
+            <li>SDE cascade — mini → verify → escalate</li>
+            <li>MAGI majority vote — three Jev “sages” <span class="src">@nagata_hideyuki</span></li>
+            <li>rtrvr.ai browser agents — claimed ~40% faster tasks</li>
+            <li>Cloudflare AI Gateway · Vercel AI Gateway listings</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section id="patterns" class="patterns">
+      <h2>Shared machinery</h2>
+      <p class="section-lede">Not extra use cases — the patterns every leaf is built from.</p>
+      <div class="pattern-grid">
+        <article>
+          <h3>Speculative fan-out</h3>
+          <p>Ask ten questions in one call. Code keeps what mattered. Time barely moves.</p>
+        </article>
+        <article>
+          <h3>Confidence gates</h3>
+          <p>Act above the threshold. Human or LLM below. Calibrated belief as architecture.</p>
+        </article>
+        <article>
+          <h3>Cascade</h3>
+          <p>Jev → pure code → specialist LLM → human. Pay for intelligence only when you need it.</p>
+        </article>
+        <article>
+          <h3>Retrieve, then judge</h3>
+          <p>Fetch precisely. Hand Jev tight state. Accuracy is a function of what you allow it to see.</p>
+        </article>
+        <article>
+          <h3>Composite scoring</h3>
+          <p>Atomic Scores + your weights. Re-weight in code, not in a prompt rewrite.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="limits" class="limits">
+      <div class="limits__grid">
+        <div>
+          <h2>Out of scope</h2>
+          <ul>
+            <li>Generating text, code, or rationales</li>
+            <li>Arithmetic, counting, date math</li>
+            <li>Open answers outside a declared option set</li>
+            <li>Perception / control-rate loops (pixels, 500 Hz flight)</li>
+          </ul>
+        </div>
+        <div>
+          <h2>Speculative on X</h2>
+          <ul>
+            <li>PCB routing via parallel “aerial view” <span class="src">@ne0v0ne</span></li>
+            <li>Drone targeting as a product claim — Register speculation, not TypeSafe</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="virality">
+      <h2>What’s lighting up X</h2>
+      <ol>
+        <li>Diogo’s launch — <span class="src">@CompleteSkeptic</span></li>
+        <li>Doom + Wikiracing demos</li>
+        <li>Browser Use 7-second Flights agent</li>
+        <li>Cloudflare AI Gateway listing</li>
+        <li>Trading bot · Subway Surfers×50 · MAGI · Claude Code saver · Cua</li>
+      </ol>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <p>
+      Community compilation of public posts, demos, and docs · not affiliated with TypeSafe AI ·
+      official account <a href="https://x.com/typesafeai" rel="noopener">@typesafeai</a>
+    </p>
+    <p>
+      <a href="https://github.com/galigutta/jev-use-cases">Source</a>
+      · Map curated Sep 17, 2026
+    </p>
+  </footer>
+
+  <script src="app.js" defer></script>
+</body>
+</html>
