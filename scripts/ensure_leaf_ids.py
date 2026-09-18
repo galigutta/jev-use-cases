@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Ensure every leaf <li> in docs/index.html has a stable id=leaf-{pillar}-{slug}."""
+"""Ensure every leaf <li> in docs/index.html has a stable leaf-* id."""
 from __future__ import annotations
 
 import argparse
@@ -25,7 +25,7 @@ def ensure(html: str) -> str:
         open_tag, pillar, body, close = m.group(1), m.group(2), m.group(3), m.group(4)
         used = set(re.findall(r'id="(leaf-[^"]+)"', body))
 
-        def repl(mm: re.Match[str], pillar: str = pillar, used: set[str] = used) -> str:
+        def repl(mm, pillar=pillar, used=used):
             rest = mm.group(1)
             pm = re.match(r'\s*<span class="leaf-primary">([\s\S]*?)</span>', rest)
             primary = pm.group(1) if pm else pillar
@@ -36,7 +36,7 @@ def ensure(html: str) -> str:
                 leaf_id = f"leaf-{pillar}-{base}-{i}"
                 i += 1
             used.add(leaf_id)
-            return f'<li id="{leaf_id}">{rest'
+            return '<li id="%s">%s' % (leaf_id, rest)
 
         body2 = re.sub(r'<li>(\s*<span class="leaf-primary"[\s\S]*?</li>)', repl, body)
         out.append(open_tag + body2 + close)
