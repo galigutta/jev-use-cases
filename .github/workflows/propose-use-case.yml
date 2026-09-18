@@ -360,7 +360,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           BRANCH: ${{ steps.branch.outputs.branch }}
           ISSUE: ${{ steps.input.outputs.issue_number }}
-          PILLAR: ${{ steps.grade.outputs.pillar }}
+          PILLAR: ${{ steps.pregrade.outputs.pillar || steps.grade.outputs.pillar }}
         run: |
           set -euo pipefail
           git config user.email "galigutta@users.noreply.github.com"
