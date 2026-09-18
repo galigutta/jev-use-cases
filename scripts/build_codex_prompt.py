@@ -5,8 +5,15 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from pathlib import Path
+
+
+def slugify(text: str) -> str:
+    s = re.sub(r"<[^>]+>", "", text).lower()
+    s = re.sub(r"[^a-z0-9]+", "-", s).strip("-")
+    return (s[:48].rstrip("-") or "leaf")
 
 
 def main() -> int:
@@ -28,11 +35,20 @@ def main() -> int:
 
     proposal = (data.get("proposal") or "").strip()
     source_url = (data.get("source_url") or "").strip()
+    note = (data.get("note") or "").strip()
     answers = data.get("answers") or {}
-    pillar = ((answers.get("pillar") or {}).get("choice")) or "workflow"
+    pillar = ((answers.get("pillar") or {}).get("choice")) or data.get("pillar") or "workflow"
+    if pillar not in ("workflow", "bulk", "realtime", "verify", "harness", "voice"):
+        pillar = "workflow"
     noul = (answers.get("is_novel") or {}).get("noul")
     novelty_score = (answers.get("novelty_score") or {}).get("score")
     overlap = answers.get("overlap") or {}
+    accepted_via = data.get("accepted_via") or ""
+
+    # Suggest a leaf id slug from the first line of proposal / note / url
+    seed = note or proposal.split("\n", 1)[0] or source_url or "new-use-case"
+    seed = re.sub(r"^Use case proposed via link\S*\s*", "", seed).strip()
+    suggested_id = f"leaf-{pillar}-{slugify(seed)}"
 
     issue_line = ""
     if args.issue_number:
@@ -41,23 +57,56 @@ def main() -> int:
             issue_line += f" ({args.issue_url})"
         issue_line += "\n"
 
+    link_hint = source_url or "(none — use a conceptual blurb pattern, do not invent URLs)"
+
     prompt = f"""# Task: add one novel Jev use-case leaf to the MECE map
 
-You are editing the community Jev use-case map repo. Implement a **commit-ready** change.
+You are editing the community Jev use-case map. Make a **minimal, commit-ready** HTML edit.
 
 ## Hard constraints
-- Edit **`docs/index.html` only** (and `docs/styles.css` / `docs/app.js` only if strictly required for an existing pattern — almost never needed).
-- **Never add a new pillar.** The six pillars are fixed: workflow, bulk, realtime, verify, harness, voice.
-- Keep the taxonomy **MECE**: one leaf under the chosen pillar; do not duplicate nearby leaves.
-- Match existing leaf HTML patterns inside `#pillar-{pillar} > ul.leaves`:
-  - Linked demos/repos/handles → `<li>` with `<span class="leaf-primary">…</span>` + `<span class="leaf-meta">` containing `<a href="…" rel="noopener">…</a>`.
-  - Conceptual / no public demo → include a `why` blurb button + `.blurb-panel` like the Voice pillar examples (unique `id`s).
-- **Do not invent sources.** Only link URLs or handles explicitly present in the proposal or source URL below. If none, use a conceptual blurb, not fake links.
-- Preserve the dark design system, existing markup, and indentation style.
-- Do not touch README, workflows, scripts, or unrelated sections.
+- Edit **`docs/index.html` only**. Do not touch README, workflows, scripts, CSS, or JS.
+- **Never add a new pillar.** Pillars are fixed: workflow, bulk, realtime, verify, harness, voice.
+- Add the leaf under **`article#pillar-{pillar}` → `ul.leaves`**.
+- **Do not invent sources.** Only link URLs/handles present in the proposal or Source URL. If there is a Source URL, prefer a simple linked leaf (no fake “why” blurbs).
+- Preserve indentation (2 spaces), existing classes, and design. Do not reformat the file.
+- CI regenerates `docs/use_cases.json` after you finish — you must still set a correct **`id`** on the `<li>` so the inventory can deep-link.
+
+## Required HTML shape (copy this pattern)
+
+When there is a public link (preferred):
+
+```html
+            <li id="{suggested_id}">
+              <span class="leaf-primary">Short title — optional clause</span>
+              <span class="leaf-meta">
+                <a href="SOURCE_URL" rel="noopener">label</a>
+              </span>
+            </li>
+```
+
+Rules for that pattern:
+- `id` must be unique, start with `leaf-{pillar}-`, kebab-case, no spaces.
+- `leaf-primary` is **plain text only** (you may wrap a short lead phrase in `<strong>…</strong>` like Voice siblings). Do **not** put buttons, panels, or links inside `leaf-primary`.
+- Put every `<a>` inside `leaf-meta`, each with `rel="noopener"`.
+- Insert before `</ul>` of that pillar (or next to the closest related leaf). Do not nest inside another `<li>`.
+
+Only if there is **no** usable URL, use the conceptual Voice-style blurb (unique blurb ids):
+
+```html
+            <li id="{suggested_id}">
+              <span class="leaf-primary">
+                <strong>Short title</strong> — clause
+                <button type="button" class="blurb" aria-expanded="false" aria-controls="blurb-YOUR_SLUG" id="blurb-btn-YOUR_SLUG">why</button>
+              </span>
+              <div class="blurb-panel" id="blurb-YOUR_SLUG" hidden>
+                One or two sentences grounded in the proposal. No invented facts.
+              </div>
+            </li>
+```
 
 ## Jev grading context
-- Chosen pillar: **{pillar}**
+- Chosen pillar: **{pillar}** (do not change this)
+- accepted_via: {accepted_via or "n/a"}
 - Novelty noul (is_novel): {noul}
 - Novelty score: {novelty_score}
 - Closest overlap: {overlap.get("choice")} — {overlap.get("leaf_text") or "n/a"}
@@ -68,19 +117,18 @@ You are editing the community Jev use-case map repo. Implement a **commit-ready*
 ```
 
 ## Source URL
-{source_url or "(none)"}
+{link_hint}
 
-## Deliverable
-1. Add exactly **one** new `<li>` leaf under `article#pillar-{pillar}` / `ul.leaves`.
-2. Wording: concise leaf title in the same voice as siblings; include handles/repos from the proposal when present.
-3. Leave the rest of the page unchanged.
-4. Ensure the HTML remains valid and the leaf sits in a sensible place in the list (often near related leaves, or at the end of the pillar).
-
-When done, leave the working tree with your edits ready to commit (Codex may write files directly).
+## Deliverable checklist
+1. Exactly **one** new `<li>` under `#pillar-{pillar} ul.leaves`.
+2. Valid `id` on that `<li>` (suggested: `{suggested_id}` — change the slug if needed for uniqueness/clarity).
+3. Concise title in the same voice as sibling leaves.
+4. Links only from the proposal/source; labels short (`@handle`, repo name, `live demo`, etc.).
+5. No other edits. Leave the working tree ready to commit.
 """
 
     args.out.write_text(prompt, encoding="utf-8")
-    print(f"wrote {args.out}")
+    print(f"wrote {args.out} pillar={pillar} suggested_id={suggested_id}")
     return 0
 
 

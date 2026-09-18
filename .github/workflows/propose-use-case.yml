@@ -374,11 +374,10 @@ jobs:
           git config user.email "galigutta@users.noreply.github.com"
           git config user.name "galigutta"
 
-          # Ignore ephemeral grading artifacts
-          git checkout -- use_cases.json novelty.json codex-prompt.md proposal.txt source_url.txt 2>/dev/null || true
-          rm -f use_cases.json novelty.json proposal.txt source_url.txt
-          # Keep codex-prompt.md out of the PR unless Codex somehow needs it — drop it
-          rm -f codex-prompt.md
+          # Scrub root-level ephemeral grading artifacts only.
+          # Keep docs/use_cases.json — refreshed in the previous step and must ship in the PR.
+          git checkout -- novelty.json codex-prompt.md proposal.txt source_url.txt 2>/dev/null || true
+          rm -f use_cases.json novelty.json proposal.txt source_url.txt codex-prompt.md
 
           if git diff --quiet && git diff --cached --quiet; then
             # Also check untracked that matter
