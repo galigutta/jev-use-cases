@@ -61,6 +61,10 @@ jobs:
           WD_URL: ${{ github.event.inputs.source_url }}
           RD_PROPOSAL: ${{ github.event.client_payload.proposal }}
           RD_URL: ${{ github.event.client_payload.source_url }}
+          RD_GRADED_BY: ${{ github.event.client_payload.graded_by }}
+          RD_NOVEL: ${{ github.event.client_payload.novel }}
+          RD_PILLAR: ${{ github.event.client_payload.pillar }}
+          RD_PAYLOAD: ${{ toJson(github.event.client_payload) }}
         run: |
           set -euo pipefail
           python3 <<'PY'
@@ -138,15 +142,84 @@ jobs:
           write_out("issue_number", issue_number)
           write_out("issue_url", issue_url)
           print(f"proposal_len={len(proposal)} source_url={bool(source_url)} issue={issue_number or '-'}")
-          if not proposal:
-              raise SystemExit("empty proposal")
+          if not proposal and not source_url:
+              raise SystemExit("Need a Source URL and/or Description")
           PY
 
       - name: Extract existing use cases
         run: python3 scripts/extract_use_cases.py --out use_cases.json
 
+      - name: Detect instant grade from propose API
+        id: pregrade
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE: ${{ steps.input.outputs.issue_number }}
+          EVENT_NAME: ${{ github.event_name }}
+          RD_GRADED_BY: ${{ github.event.client_payload.graded_by }}
+          RD_NOVEL: ${{ github.event.client_payload.novel }}
+          RD_PILLAR: ${{ github.event.client_payload.pillar }}
+          RD_PAYLOAD: ${{ toJson(github.event.client_payload) }}
+        run: |
+          set -euo pipefail
+          # Path A: repository_dispatch already graded by the Worker
+          if [ "${EVENT_NAME}" = "repository_dispatch" ] && [ "${RD_GRADED_BY}" = "propose-api" ]; then
+            python3 <<'PY'
+          import json, os
+          from pathlib import Path
+          payload = json.loads(os.environ.get("RD_PAYLOAD") or "{}")
+          novel = str(os.environ.get("RD_NOVEL") or payload.get("novel") or "").lower() in ("true", "1", "yes")
+          pillar = os.environ.get("RD_PILLAR") or payload.get("pillar") or "workflow"
+          novelty = {
+              "verdict": "novel" if novel else "duplicate",
+              "novel": novel,
+              "graded_by": "propose-api",
+              "proposal": payload.get("proposal") or "",
+              "source_url": payload.get("source_url") or None,
+              "note": payload.get("note") or "",
+              "noul_threshold": payload.get("noul_threshold"),
+              "score_threshold": payload.get("score_threshold"),
+              "sat": payload.get("sat"),
+              "n_leaves": payload.get("n_leaves"),
+              "answers": {
+                  "pillar": {"choice": pillar, "type": "choice"},
+                  "is_novel": {"noul": payload.get("noul"), "type": "noul"},
+                  "novelty_score": {"score": payload.get("novelty_score"), "type": "score"},
+                  "overlap": {
+                      "choice": payload.get("overlap") or "none",
+                      "leaf_text": payload.get("overlap_text"),
+                  },
+              },
+          }
+          Path("novelty.json").write_text(json.dumps(novelty, indent=2), encoding="utf-8")
+          out = os.environ["GITHUB_OUTPUT"]
+          with open(out, "a", encoding="utf-8") as f:
+              f.write("found=true\n")
+              f.write(f"novel={'true' if novel else 'false'}\n")
+              f.write(f"pillar={pillar}\n")
+          print(f"pregrade from Worker dispatch novel={novel} pillar={pillar}")
+          PY
+            exit 0
+          fi
+          # Path B: issue comment left by an older propose-api path
+          if [ -n "${ISSUE}" ]; then
+            body="$(gh api "repos/${{ github.repository }}/issues/${ISSUE}/comments" --jq 'map(select(.body | contains("graded-by:propose-api"))) | .[0].body // empty' || true)"
+            if [ -n "$body" ]; then
+              echo "found=true" >> "$GITHUB_OUTPUT"
+              if echo "$body" | grep -Eq '\*\*Verdict:\*\* `novel`'; then
+                echo "novel=true" >> "$GITHUB_OUTPUT"
+              else
+                echo "novel=false" >> "$GITHUB_OUTPUT"
+              fi
+              echo "Propose API already graded — skipping Actions Jev call."
+              exit 0
+            fi
+          fi
+          echo "found=false" >> "$GITHUB_OUTPUT"
+          echo "novel=" >> "$GITHUB_OUTPUT"
+
       - name: Grade novelty with Jev
         id: grade
+        if: steps.pregrade.outputs.found != 'true'
         env:
           TYPESAFE_API_KEY: ${{ secrets.TYPESAFE_API_KEY }}
           GITHUB_TOKEN: ${{ github.token }}
@@ -181,7 +254,7 @@ jobs:
           PY
 
       - name: Comment Jev verdict on issue
-        if: steps.input.outputs.issue_number != ''
+        if: steps.input.outputs.issue_number != '' && steps.pregrade.outputs.found != 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -231,13 +304,13 @@ jobs:
           gh issue comment "${{ steps.input.outputs.issue_number }}" --body-file /tmp/verdict-comment.md
 
       - name: Stop if not novel
-        if: steps.grade.outputs.novel != 'true'
+        if: (steps.pregrade.outputs.found == 'true' && steps.pregrade.outputs.novel != 'true') || (steps.pregrade.outputs.found != 'true' && steps.grade.outputs.novel != 'true')
         run: |
           echo "Not novel — exiting successfully without PR."
           exit 0
 
       - name: Build Codex prompt
-        if: steps.grade.outputs.novel == 'true'
+        if: (steps.pregrade.outputs.novel == 'true' || steps.grade.outputs.novel == 'true')
         run: |
           python3 scripts/build_codex_prompt.py \
             --novelty novelty.json \
@@ -246,7 +319,7 @@ jobs:
             --issue-url "${{ steps.input.outputs.issue_url }}"
 
       - name: Create propose branch
-        if: steps.grade.outputs.novel == 'true'
+        if: (steps.pregrade.outputs.novel == 'true' || steps.grade.outputs.novel == 'true')
         id: branch
         run: |
           set -euo pipefail
@@ -262,7 +335,7 @@ jobs:
           echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
 
       - name: Run Codex
-        if: steps.grade.outputs.novel == 'true'
+        if: (steps.pregrade.outputs.novel == 'true' || steps.grade.outputs.novel == 'true')
         uses: openai/codex-action@v1
         with:
           openai-api-key: ${{ secrets.OPENAI_API_KEY }}
@@ -273,7 +346,7 @@ jobs:
           effort: max
 
       - name: Commit, push, open PR
-        if: steps.grade.outputs.novel == 'true'
+        if: (steps.pregrade.outputs.novel == 'true' || steps.grade.outputs.novel == 'true')
         env:
           GH_TOKEN: ${{ github.token }}
           BRANCH: ${{ steps.branch.outputs.branch }}

@@ -102,7 +102,7 @@
   const API_ISSUES =
     "https://api.github.com/repos/galigutta/jev-use-cases/issues";
   const PROPOSE_API =
-    window.JEV_PROPOSE_API || "https://jev-propose.galigutta.workers.dev";
+    window.JEV_PROPOSE_API || "https://jev-propose.vamsir.workers.dev";
 
   const looksLikeUrl = (s) => {
     try {
@@ -274,7 +274,7 @@
     }
 
     if (submitBtn) submitBtn.disabled = true;
-    setLive("waiting", "Submitting…");
+    setLive("waiting", "Checking with Jev…");
 
     try {
       const res = await fetch(PROPOSE_API, {
@@ -286,10 +286,34 @@
       if (!res.ok) {
         throw new Error(data.error || `Submit failed (HTTP ${res.status})`);
       }
-      if (!data.number) {
-        throw new Error("Submit succeeded but no issue number came back.");
+
+      // Worker grades with Jev in-request. Duplicates never create a GitHub issue.
+      if (data.verdict === "novel" || data.novel === true) {
+        const detail = data.html_url
+          ? ` <a href="${data.html_url}" rel="noopener">Details</a>`
+          : ` <a href="https://github.com/galigutta/jev-use-cases/pulls" rel="noopener">Watch the PR</a>`;
+        setLive(
+          "ok",
+          `<strong>Accepted</strong> — it’s new` +
+            (data.pillar ? ` (→ <em>${data.pillar}</em>)` : "") +
+            `. A leaf is being written and <strong>auto-merged</strong> onto the map.` +
+            detail,
+        );
+      } else if (data.verdict === "duplicate" || data.novel === false) {
+        const overlap = data.overlap_text || data.overlap || "";
+        setLive(
+          "dup",
+          `<strong>Already on the map</strong> (or too close to an existing leaf)` +
+            (overlap && overlap !== "none"
+              ? `: <em>${String(overlap).replace(/</g, "&lt;")}</em>`
+              : "") +
+            `. Nothing was filed or merged.`,
+        );
+      } else if (data.number && data.html_url) {
+        startWatching({ number: data.number, html_url: data.html_url });
+      } else {
+        throw new Error("No verdict came back from Jev.");
       }
-      startWatching({ number: data.number, html_url: data.html_url });
     } catch (err) {
       setLive(
         "info",
