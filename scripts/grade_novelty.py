@@ -27,9 +27,9 @@ PILLARS = ("workflow", "bulk", "realtime", "verify", "harness", "voice")
 
 # Overlap-first rubric; thresholds only break gray-zone (weak overlap) cases.
 # Rise modestly with catalog saturation.
-BASE_NOUL_THRESHOLD = 0.70
+BASE_NOUL_THRESHOLD = 0.58
 BASE_SCORE_THRESHOLD = 2.4
-NOUL_SAT_SPAN = 0.15  # → ~0.85 at 200 leaves
+NOUL_SAT_SPAN = 0.20  # → ~0.78 at 200 leaves (from 0.58 base)
 SCORE_SAT_SPAN = 0.9  # → ~3.3 at 200 leaves
 SAT_START = 40
 SAT_RANGE = 160  # full sat at n=200

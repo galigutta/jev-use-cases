@@ -26,9 +26,9 @@ const PILLAR_CRITERIA = {
   voice: "Voice / audio-path judgment",
 };
 
-const BASE_NOUL = 0.70;
+const BASE_NOUL = 0.58;
 const BASE_SCORE = 2.4;
-const NOUL_SAT = 0.15;
+const NOUL_SAT = 0.20;
 const SCORE_SAT = 0.9;
 const SAT_START = 40;
 const SAT_RANGE = 160;
