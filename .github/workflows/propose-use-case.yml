@@ -354,6 +354,14 @@ jobs:
           model: gpt-5.6-luna
           effort: max
 
+      - name: Refresh use_cases inventory
+        if: (steps.pregrade.outputs.novel == 'true' || steps.grade.outputs.novel == 'true')
+        run: |
+          set -euo pipefail
+          python3 scripts/ensure_leaf_ids.py --html docs/index.html
+          python3 scripts/extract_use_cases.py --html docs/index.html --out docs/use_cases.json
+          python3 -c "import json; print('inventory', json.load(open('docs/use_cases.json'))['count'])"
+
       - name: Commit, push, open PR
         if: (steps.pregrade.outputs.novel == 'true' || steps.grade.outputs.novel == 'true')
         env:

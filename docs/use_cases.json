@@ -1,5 +1,5 @@
 {
-  "count": 41,
+  "count": 43,
   "pillars": [
     "workflow",
     "bulk",
@@ -51,6 +51,19 @@
     },
     {
       "pillar": "workflow",
+      "text": "Semantic spreadsheet formatting — instantly for @tryshortcutai",
+      "links": [
+        {
+          "text": "@GuangyuRobert proposal",
+          "href": "https://x.com/GuangyuRobert/status/2100601420395282695"
+        }
+      ],
+      "id": "leaf-workflow-semantic-spreadsheet-formatting",
+      "href": "#leaf-workflow-semantic-spreadsheet-formatting",
+      "blurb": "Conceptual System One leaf: use Jev to semantically format a spreadsheet instantly; Robert Yang’s proposal asks whether it should live in @tryshortcutai."
+    },
+    {
+      "pillar": "workflow",
       "text": "Home Assistant automations",
       "links": [
         {
@@ -60,6 +73,18 @@
       ],
       "id": "leaf-workflow-home-assistant-automations",
       "href": "#leaf-workflow-home-assistant-automations"
+    },
+    {
+      "pillar": "workflow",
+      "text": "Upweight — weighted Hacker News front page",
+      "links": [
+        {
+          "text": "live demo",
+          "href": "https://upweight.vercel.app/?w=td%3A60%2Cdr%3A20%2Cpu%3A60%2Csl%3A-40%2Cnv%3A40%2Ccr%3A20"
+        }
+      ],
+      "id": "leaf-workflow-upweight-weighted-hacker-news",
+      "href": "#leaf-workflow-upweight-weighted-hacker-news"
     },
     {
       "pillar": "workflow",
