@@ -1,5 +1,5 @@
 {
-  "count": 43,
+  "count": 44,
   "pillars": [
     "workflow",
     "bulk",
@@ -85,6 +85,18 @@
       ],
       "id": "leaf-workflow-upweight-weighted-hacker-news",
       "href": "#leaf-workflow-upweight-weighted-hacker-news"
+    },
+    {
+      "pillar": "workflow",
+      "text": "Rankhog — detect Reddit promotion opportunities and outrank posts in Google / ChatGPT",
+      "links": [
+        {
+          "text": "@anthonyriera",
+          "href": "https://x.com/anthonyriera/status/2100611323562233976"
+        }
+      ],
+      "id": "leaf-workflow-anthony-riera-i-quickly-added-jev-by-typesafe-to",
+      "href": "#leaf-workflow-anthony-riera-i-quickly-added-jev-by-typesafe-to"
     },
     {
       "pillar": "workflow",
