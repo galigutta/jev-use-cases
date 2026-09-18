@@ -167,26 +167,35 @@ jobs:
           import json, os
           from pathlib import Path
           payload = json.loads(os.environ.get("RD_PAYLOAD") or "{}")
+          grade = payload.get("grade") if isinstance(payload.get("grade"), dict) else {}
+          # Flat fallback for older payloads
+          g = {**payload, **grade}
           novel = str(os.environ.get("RD_NOVEL") or payload.get("novel") or "").lower() in ("true", "1", "yes")
           pillar = os.environ.get("RD_PILLAR") or payload.get("pillar") or "workflow"
           novelty = {
-              "verdict": "novel" if novel else "duplicate",
+              "verdict": g.get("verdict") or ("novel" if novel else "duplicate"),
               "novel": novel,
               "graded_by": "propose-api",
+              "accepted_via": payload.get("accepted_via"),
               "proposal": payload.get("proposal") or "",
               "source_url": payload.get("source_url") or None,
               "note": payload.get("note") or "",
-              "noul_threshold": payload.get("noul_threshold"),
-              "score_threshold": payload.get("score_threshold"),
-              "sat": payload.get("sat"),
-              "n_leaves": payload.get("n_leaves"),
+              "noul_threshold": g.get("noul_threshold"),
+              "score_threshold": g.get("score_threshold"),
+              "sat": g.get("sat"),
+              "n_leaves": g.get("n_leaves"),
               "answers": {
-                  "pillar": {"choice": pillar, "type": "choice"},
-                  "is_novel": {"noul": payload.get("noul"), "type": "noul"},
-                  "novelty_score": {"score": payload.get("novelty_score"), "type": "score"},
+                  "pillar": {
+                      "choice": pillar,
+                      "confidence": g.get("pillar_confidence"),
+                      "type": "choice",
+                  },
+                  "is_novel": {"noul": g.get("noul"), "type": "noul"},
+                  "novelty_score": {"score": g.get("novelty_score"), "type": "score"},
                   "overlap": {
-                      "choice": payload.get("overlap") or "none",
-                      "leaf_text": payload.get("overlap_text"),
+                      "choice": g.get("overlap") or "none",
+                      "leaf_text": g.get("overlap_text"),
+                      "confidence": g.get("overlap_confidence"),
                   },
               },
           }

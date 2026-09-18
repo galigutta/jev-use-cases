@@ -626,13 +626,33 @@ export default {
       return json({ ...publicGrade, issue: null, dispatched: false });
     }
 
-    // Novel: pass Worker verdict downstream via repository_dispatch (skip re-grade in Actions).
+    // Novel: repository_dispatch client_payload max 10 TOP-LEVEL keys (GitHub API).
+    // Keep extras nested under `grade`. Page response still gets the full publicGrade.
     const dispatchPayload = {
-      ...publicGrade,
+      graded_by: "propose-api",
+      novel: true,
       proposal: gradeResult.proposal,
       source_url: url || "",
       note: note || "",
-      graded_by: "propose-api",
+      pillar: gradeResult.pillar,
+      accepted_via: gradeResult.accepted_via || "clears_bar",
+      grade: {
+        verdict: gradeResult.verdict,
+        pillar_confidence: gradeResult.pillar_confidence,
+        noul: gradeResult.noul,
+        novelty_score: gradeResult.novelty_score,
+        noul_threshold: gradeResult.noul_threshold,
+        score_threshold: gradeResult.score_threshold,
+        sat: gradeResult.sat,
+        n_leaves: gradeResult.n_leaves,
+        overlap: gradeResult.overlap,
+        overlap_text: gradeResult.overlap_text,
+        overlap_id: gradeResult.overlap_id,
+        overlap_href: gradeResult.overlap_href,
+        overlap_confidence: gradeResult.overlap_confidence,
+        gates: gradeResult.gates,
+        why: gradeResult.why,
+      },
     };
 
     const { res: dres, data: ddata } = await gh(
