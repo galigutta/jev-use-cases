@@ -47,6 +47,7 @@ class LeafExtractor(HTMLParser):
 
         if tag == "li":
             self._in_li = True
+            self._leaf_id = attr.get("id") or ""
             self._primary_parts = []
             self._blurb_parts = []
             self._links = []
@@ -138,6 +139,10 @@ class LeafExtractor(HTMLParser):
                     "text": text,
                     "links": self._links,
                 }
+                leaf_id = getattr(self, "_leaf_id", "") or ""
+                if leaf_id:
+                    entry["id"] = leaf_id
+                    entry["href"] = f"#{leaf_id}"
                 if blurb:
                     entry["blurb"] = blurb
                 self.leaves.append(entry)

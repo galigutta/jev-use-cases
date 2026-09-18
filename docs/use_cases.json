@@ -21,7 +21,9 @@
           "text": "docs map",
           "href": "https://docs.typesafe.ai/concepts/use-case-map"
         }
-      ]
+      ],
+      "id": "leaf-workflow-support-triage-dept-urgency-frustration-refund-p",
+      "href": "#leaf-workflow-support-triage-dept-urgency-frustration-refund-p"
     },
     {
       "pillar": "workflow",
@@ -31,7 +33,9 @@
           "text": "use-case map",
           "href": "https://docs.typesafe.ai/concepts/use-case-map"
         }
-      ]
+      ],
+      "id": "leaf-workflow-lead-icp-qualification-insurance-fnol-fincrime-k",
+      "href": "#leaf-workflow-lead-icp-qualification-insurance-fnol-fincrime-k"
     },
     {
       "pillar": "workflow",
@@ -41,7 +45,9 @@
           "text": "docs",
           "href": "https://docs.typesafe.ai/concepts/use-case-map"
         }
-      ]
+      ],
+      "id": "leaf-workflow-e-com-listing-normalize-returns-auto-approve-pr",
+      "href": "#leaf-workflow-e-com-listing-normalize-returns-auto-approve-pr"
     },
     {
       "pillar": "workflow",
@@ -51,7 +57,9 @@
           "text": "AboveColin/HA-Jev",
           "href": "https://github.com/AboveColin/HA-Jev"
         }
-      ]
+      ],
+      "id": "leaf-workflow-home-assistant-automations",
+      "href": "#leaf-workflow-home-assistant-automations"
     },
     {
       "pillar": "workflow",
@@ -65,7 +73,9 @@
           "text": "Valyu guide",
           "href": "https://dev.to/valyuai/how-to-use-jev-a-practical-guide-to-typesafes-system-one-model-g5e"
         }
-      ]
+      ],
+      "id": "leaf-workflow-canonical-framing",
+      "href": "#leaf-workflow-canonical-framing"
     },
     {
       "pillar": "bulk",
@@ -79,7 +89,9 @@
           "text": "Valyu (Hassan El Mghari)",
           "href": "https://dev.to/valyuai/how-to-use-jev-a-practical-guide-to-typesafes-system-one-model-g5e"
         }
-      ]
+      ],
+      "id": "leaf-bulk-paper-topic-classification-1-018-24-topics-0-08",
+      "href": "#leaf-bulk-paper-topic-classification-1-018-24-topics-0-08"
     },
     {
       "pillar": "bulk",
@@ -89,7 +101,9 @@
           "text": "confidence taxonomy cookbook",
           "href": "https://docs.typesafe.ai/cookbooks/classification_using_confidence"
         }
-      ]
+      ],
+      "id": "leaf-bulk-sec-taxonomy-collapse-survey-coding-cms-tagging",
+      "href": "#leaf-bulk-sec-taxonomy-collapse-survey-coding-cms-tagging"
     },
     {
       "pillar": "bulk",
@@ -99,7 +113,9 @@
           "text": "cookbook",
           "href": "https://docs.typesafe.ai/cookbooks/autoresearch_feature_discovery"
         }
-      ]
+      ],
+      "id": "leaf-bulk-autoresearch-feature-discovery-classical-ml",
+      "href": "#leaf-bulk-autoresearch-feature-discovery-classical-ml"
     },
     {
       "pillar": "bulk",
@@ -109,7 +125,9 @@
           "text": "live demo",
           "href": "https://crowdcheck-ai.vercel.app/"
         }
-      ]
+      ],
+      "id": "leaf-bulk-crowdcheck-10k-synthetic-personas",
+      "href": "#leaf-bulk-crowdcheck-10k-synthetic-personas"
     },
     {
       "pillar": "bulk",
@@ -119,7 +137,9 @@
           "text": "TypeSafe launch",
           "href": "https://typesafe.ai/blog/introducing-system-one-models-and-jev"
         }
-      ]
+      ],
+      "id": "leaf-bulk-map-reduce-thesis",
+      "href": "#leaf-bulk-map-reduce-thesis"
     },
     {
       "pillar": "realtime",
@@ -133,7 +153,9 @@
           "text": "@CompleteSkeptic",
           "href": "https://x.com/CompleteSkeptic"
         }
-      ]
+      ],
+      "id": "leaf-realtime-doom-10-hz-7-hr",
+      "href": "#leaf-realtime-doom-10-hz-7-hr"
     },
     {
       "pillar": "realtime",
@@ -143,7 +165,9 @@
           "text": "launch demo",
           "href": "https://typesafe.ai/blog/introducing-system-one-models-and-jev"
         }
-      ]
+      ],
+      "id": "leaf-realtime-wikiracing-high-cardinality-links",
+      "href": "#leaf-realtime-wikiracing-high-cardinality-links"
     },
     {
       "pillar": "realtime",
@@ -157,7 +181,9 @@
           "text": "@kkurilyak",
           "href": "https://x.com/kkurilyak"
         }
-      ]
+      ],
+      "id": "leaf-realtime-subway-surfers-50-parallel",
+      "href": "#leaf-realtime-subway-surfers-50-parallel"
     },
     {
       "pillar": "realtime",
@@ -167,7 +193,9 @@
           "text": "fhshaik/typesafe-mario",
           "href": "https://github.com/fhshaik/typesafe-mario"
         }
-      ]
+      ],
+      "id": "leaf-realtime-super-mario-from-emulator-ram",
+      "href": "#leaf-realtime-super-mario-from-emulator-ram"
     },
     {
       "pillar": "realtime",
@@ -177,7 +205,9 @@
           "text": "phyous/tsai-sc",
           "href": "https://github.com/phyous/tsai-sc"
         }
-      ]
+      ],
+      "id": "leaf-realtime-starcraft-shareware-421-decisions",
+      "href": "#leaf-realtime-starcraft-shareware-421-decisions"
     },
     {
       "pillar": "realtime",
@@ -187,7 +217,9 @@
           "text": "AbdelStark/heist-one",
           "href": "https://github.com/AbdelStark/heist-one"
         }
-      ]
+      ],
+      "id": "leaf-realtime-heist-one-stealth-game",
+      "href": "#leaf-realtime-heist-one-stealth-game"
     },
     {
       "pillar": "realtime",
@@ -201,7 +233,9 @@
           "text": "@gregpr07",
           "href": "https://x.com/gregpr07/status/2100411066966749359"
         }
-      ]
+      ],
+      "id": "leaf-realtime-browser-use-jev-ultrafast-zrh-lon-7-1s-0-0039",
+      "href": "#leaf-realtime-browser-use-jev-ultrafast-zrh-lon-7-1s-0-0039"
     },
     {
       "pillar": "realtime",
@@ -219,7 +253,9 @@
           "text": "@ValencianaAbel",
           "href": "https://x.com/ValencianaAbel"
         }
-      ]
+      ],
+      "id": "leaf-realtime-desktop-computer-use",
+      "href": "#leaf-realtime-desktop-computer-use"
     },
     {
       "pillar": "realtime",
@@ -229,7 +265,9 @@
           "text": "Friedjof/jev-mobile",
           "href": "https://github.com/Friedjof/jev-mobile"
         }
-      ]
+      ],
+      "id": "leaf-realtime-android-ui-agent",
+      "href": "#leaf-realtime-android-ui-agent"
     },
     {
       "pillar": "realtime",
@@ -239,7 +277,9 @@
           "text": "RomanSlack/jev-drone",
           "href": "https://github.com/RomanSlack/jev-drone"
         }
-      ]
+      ],
+      "id": "leaf-realtime-drone-tactical-judgment-2-5-hz",
+      "href": "#leaf-realtime-drone-tactical-judgment-2-5-hz"
     },
     {
       "pillar": "realtime",
@@ -253,7 +293,9 @@
           "text": "@jarrodwatts",
           "href": "https://x.com/jarrodwatts"
         }
-      ]
+      ],
+      "id": "leaf-realtime-market-making-monad-kuru",
+      "href": "#leaf-realtime-market-making-monad-kuru"
     },
     {
       "pillar": "realtime",
@@ -267,7 +309,9 @@
           "text": "@stevekrouse",
           "href": "https://x.com/stevekrouse/status/2100287368221659289"
         }
-      ]
+      ],
+      "id": "leaf-realtime-typewriter-live-demo",
+      "href": "#leaf-realtime-typewriter-live-demo"
     },
     {
       "pillar": "verify",
@@ -281,7 +325,9 @@
           "text": "citation_check",
           "href": "https://docs.typesafe.ai/cookbooks/citation_check"
         }
-      ]
+      ],
+      "id": "leaf-verify-jailbreak-prompt-injection-citation-groundedness",
+      "href": "#leaf-verify-jailbreak-prompt-injection-citation-groundedness"
     },
     {
       "pillar": "verify",
@@ -291,7 +337,9 @@
           "text": "cookbook",
           "href": "https://docs.typesafe.ai/cookbooks/classifying_rag_passages"
         }
-      ]
+      ],
+      "id": "leaf-verify-rag-passage-classify-contradiction",
+      "href": "#leaf-verify-rag-passage-classify-contradiction"
     },
     {
       "pillar": "verify",
@@ -301,7 +349,9 @@
           "text": "devagrawal09/jev-review",
           "href": "https://github.com/devagrawal09/jev-review"
         }
-      ]
+      ],
+      "id": "leaf-verify-staged-code-review",
+      "href": "#leaf-verify-staged-code-review"
     },
     {
       "pillar": "verify",
@@ -319,7 +369,9 @@
           "text": "jev-axi",
           "href": "https://github.com/shiftynick/jev-axi"
         }
-      ]
+      ],
+      "id": "leaf-verify-policy-loop-tool-gates",
+      "href": "#leaf-verify-policy-loop-tool-gates"
     },
     {
       "pillar": "verify",
@@ -333,7 +385,9 @@
           "text": "Vercel",
           "href": "https://vercel.com/changelog/typesafe-ai-jev-now-available-on-ai-gateway"
         }
-      ]
+      ],
+      "id": "leaf-verify-verify-everything-thesis",
+      "href": "#leaf-verify-verify-everything-thesis"
     },
     {
       "pillar": "harness",
@@ -347,7 +401,9 @@
           "text": "@marumarucanada",
           "href": "https://x.com/marumarucanada"
         }
-      ]
+      ],
+      "id": "leaf-harness-next-tool-subagent-continue-retry-ask-stop",
+      "href": "#leaf-harness-next-tool-subagent-continue-retry-ask-stop"
     },
     {
       "pillar": "harness",
@@ -361,7 +417,9 @@
           "text": "@talltalebro",
           "href": "https://x.com/talltalebro"
         }
-      ]
+      ],
+      "id": "leaf-harness-model-specialist-router",
+      "href": "#leaf-harness-model-specialist-router"
     },
     {
       "pillar": "harness",
@@ -375,7 +433,9 @@
           "text": "typesafe-ai/skills",
           "href": "https://github.com/typesafe-ai/skills"
         }
-      ]
+      ],
+      "id": "leaf-harness-skill-suggestion-over-large-catalogs",
+      "href": "#leaf-harness-skill-suggestion-over-large-catalogs"
     },
     {
       "pillar": "harness",
@@ -389,7 +449,9 @@
           "text": "@ZeBoris_",
           "href": "https://x.com/ZeBoris_"
         }
-      ]
+      ],
+      "id": "leaf-harness-context-reduction-claude-code-plugin",
+      "href": "#leaf-harness-context-reduction-claude-code-plugin"
     },
     {
       "pillar": "harness",
@@ -403,7 +465,9 @@
           "text": "@nagata_hideyuki",
           "href": "https://x.com/nagata_hideyuki"
         }
-      ]
+      ],
+      "id": "leaf-harness-magi-majority-vote",
+      "href": "#leaf-harness-magi-majority-vote"
     },
     {
       "pillar": "harness",
@@ -417,7 +481,9 @@
           "text": "@b_kalisetty",
           "href": "https://x.com/b_kalisetty"
         }
-      ]
+      ],
+      "id": "leaf-harness-rtrvr-ai-browser-agents",
+      "href": "#leaf-harness-rtrvr-ai-browser-agents"
     },
     {
       "pillar": "harness",
@@ -431,7 +497,9 @@
           "text": "Vercel AI Gateway",
           "href": "https://vercel.com/ai-gateway/models/jev"
         }
-      ]
+      ],
+      "id": "leaf-harness-gateways",
+      "href": "#leaf-harness-gateways"
     },
     {
       "pillar": "harness",
@@ -441,7 +509,9 @@
           "text": "AbdelStark/awesome-typesafe",
           "href": "https://github.com/AbdelStark/awesome-typesafe"
         }
-      ]
+      ],
+      "id": "leaf-harness-ecosystem-index",
+      "href": "#leaf-harness-ecosystem-index"
     },
     {
       "pillar": "voice",
@@ -459,12 +529,16 @@
           "text": "computer-use",
           "href": "https://github.com/awlevin/typesafe-computer-use"
         }
-      ]
+      ],
+      "id": "leaf-voice-voice-driven-computer-use-asr-dialogue-state-cli",
+      "href": "#leaf-voice-voice-driven-computer-use-asr-dialogue-state-cli"
     },
     {
       "pillar": "voice",
       "text": "Secondary turn / end-of-utterance detect — Noul bolted onto an aggressive VAD or primary turn model",
       "links": [],
+      "id": "leaf-voice-secondary-turn-end-of-utterance-detect-noul-bolt",
+      "href": "#leaf-voice-secondary-turn-end-of-utterance-detect-noul-bolt",
       "blurb": "Conceptual System One leaf (not a public Jev demo yet): stream VAD / primary EOU probabilities into state; ask a Noul like “has the user finished their turn?” and only then commit ASR→LLM. Cheap second opinion before the stack spends a frontier call."
     },
     {
@@ -476,12 +550,16 @@
           "href": "https://docs.typesafe.ai/patterns/confidence-routing"
         }
       ],
+      "id": "leaf-voice-speak-up-gate-should-the-bot-interrupt-reply-wit",
+      "href": "#leaf-voice-speak-up-gate-should-the-bot-interrupt-reply-wit",
       "blurb": "Conceptual System One leaf: Choice or Noul over stay silent / acknowledge / full reply, gated on confidence. Wake word optional — calibrated confidence is the gate. Pairs with confidence-routing patterns in TypeSafe docs."
     },
     {
       "pillar": "voice",
       "text": "Group / multi-party bot — same gate unlocks a bot in a roomful of people",
       "links": [],
+      "id": "leaf-voice-group-multi-party-bot-same-gate-unlocks-a-bot-in",
+      "href": "#leaf-voice-group-multi-party-bot-same-gate-unlocks-a-bot-in",
       "blurb": "Extension of the speak-up gate: in multi-speaker audio, decide whether this utterance is for the bot, whether interrupting helps, and whether to stay silent. Without it you need a wake word or you thrash the room."
     },
     {
@@ -500,7 +578,9 @@
           "text": "launch thesis",
           "href": "https://typesafe.ai/blog/introducing-system-one-models-and-jev"
         }
-      ]
+      ],
+      "id": "leaf-voice-adjacent-building-blocks",
+      "href": "#leaf-voice-adjacent-building-blocks"
     }
   ]
 }

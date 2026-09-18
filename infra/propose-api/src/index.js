@@ -283,6 +283,8 @@ async function loadInventory() {
     .map((c, i) => ({
       pillar: c.pillar,
       text: String(c.text || "").trim(),
+      id: c.id || "",
+      href: c.href || (c.id ? `#${c.id}` : ""),
       _idx: i,
     }))
     .filter((c) => c.text);
@@ -442,14 +444,17 @@ async function grade(apiKey, note, sourceUrl, urlText, existing) {
   const overlapChoice = answers.overlap?.choice || "none";
   const overlapConf = Number(answers.overlap?.confidence ?? 0);
   let overlapText = null;
+  let overlapId = null;
+  let overlapHref = null;
   if (String(overlapChoice).startsWith("leaf_")) {
     const idx = Number(String(overlapChoice).split("_")[1]);
     if (!Number.isNaN(idx) && peers[idx]) {
       const orig = peers[idx]._orig_idx;
-      overlapText =
-        typeof orig === "number" && existing[orig]
-          ? existing[orig].text
-          : peers[idx].text;
+      const src =
+        typeof orig === "number" && existing[orig] ? existing[orig] : null;
+      overlapText = src?.text || peers[idx].text;
+      overlapId = src?.id || null;
+      overlapHref = src?.href || (overlapId ? `#${overlapId}` : null);
     }
   }
 
@@ -483,6 +488,8 @@ async function grade(apiKey, note, sourceUrl, urlText, existing) {
     n_leaves: existing.length,
     overlap: overlapChoice,
     overlap_text: overlapText,
+    overlap_id: overlapId,
+    overlap_href: overlapHref,
     overlap_confidence: overlapConf,
     gates,
     why: novel ? [] : why,
@@ -597,6 +604,8 @@ export default {
       n_leaves: gradeResult.n_leaves,
       overlap: gradeResult.overlap,
       overlap_text: gradeResult.overlap_text,
+      overlap_id: gradeResult.overlap_id,
+      overlap_href: gradeResult.overlap_href,
       overlap_confidence: gradeResult.overlap_confidence,
       gates: gradeResult.gates,
       why: gradeResult.why,

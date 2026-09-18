@@ -850,3 +850,22 @@ a:focus-visible {
   font-size: 0.8rem;
   color: var(--ink-dim);
 }
+
+.leaves > li[id] {
+  scroll-margin-top: 5.5rem;
+}
+.leaves > li.is-flash {
+  outline: 2px solid color-mix(in srgb, var(--voice) 70%, transparent);
+  outline-offset: 4px;
+  background: color-mix(in srgb, var(--voice) 12%, transparent);
+  transition: background 0.4s ease, outline-color 0.4s ease;
+}
+.propose__leaf-link {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--voice) 55%, transparent);
+  text-underline-offset: 0.15em;
+}
+.propose__leaf-link:hover {
+  color: var(--voice);
+}

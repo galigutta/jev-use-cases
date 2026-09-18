@@ -42,9 +42,42 @@
     });
   });
 
-  // Deep link
-  const hash = location.hash.replace("#pillar-", "").replace("#", "");
-  if (known.includes(hash)) openPillar(hash, { scroll: true });
+  // Deep link — pillar or leaf
+  const rawHash = location.hash.replace(/^#/, "");
+  if (rawHash.startsWith("leaf-")) {
+    const leafEl = document.getElementById(rawHash);
+    const pillar = rawHash.split("-")[1];
+    if (known.includes(pillar)) openPillar(pillar, { scroll: false });
+    if (leafEl) {
+      requestAnimationFrame(() => {
+        leafEl.classList.add("is-flash");
+        leafEl.scrollIntoView({ behavior: "smooth", block: "center" });
+        setTimeout(() => leafEl.classList.remove("is-flash"), 2200);
+      });
+    }
+  } else {
+    const hash = rawHash.replace(/^pillar-/, "");
+    if (known.includes(hash)) openPillar(hash, { scroll: true });
+  }
+
+  // In-page leaf links from the propose verdict
+  document.addEventListener("click", (e) => {
+    const a = e.target.closest("a.propose__leaf-link");
+    if (!a) return;
+    const href = a.getAttribute("href") || "";
+    if (!href.startsWith("#leaf-")) return;
+    e.preventDefault();
+    const id = href.slice(1);
+    history.pushState(null, "", href);
+    const leafEl = document.getElementById(id);
+    const pillar = id.split("-")[1];
+    if (known.includes(pillar)) openPillar(pillar, { scroll: false });
+    if (leafEl) {
+      leafEl.classList.add("is-flash");
+      leafEl.scrollIntoView({ behavior: "smooth", block: "center" });
+      setTimeout(() => leafEl.classList.remove("is-flash"), 2200);
+    }
+  });
 
   // Intersection: highlight in-view pillar; never hide / dim others
   if ("IntersectionObserver" in window) {
@@ -172,8 +205,12 @@
     }
     const overlapLabel = data.overlap_text || data.overlap || "";
     if (overlapLabel && overlapLabel !== "none") {
+      const href = data.overlap_href || (data.overlap_id ? `#${data.overlap_id}` : "");
+      const labelHtml = href
+        ? `<a class="propose__leaf-link" href="${escapeText(href)}"><em>${escapeText(overlapLabel)}</em></a>`
+        : `<em>${escapeText(overlapLabel)}</em>`;
       rows.push(
-        `<div class="propose__metric propose__metric--wide"><span class="propose__metric-k">Closest overlap</span><span class="propose__metric-v"><em>${escapeText(overlapLabel)}</em>` +
+        `<div class="propose__metric propose__metric--wide"><span class="propose__metric-k">Closest overlap</span><span class="propose__metric-v">${labelHtml}` +
           (data.overlap_confidence != null
             ? ` <code>${fmtNum(data.overlap_confidence)}</code>`
             : "") +
