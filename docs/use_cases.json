@@ -1,5 +1,5 @@
 {
-  "count": 44,
+  "count": 45,
   "pillars": [
     "workflow",
     "bulk",
@@ -113,6 +113,18 @@
       ],
       "id": "leaf-workflow-canonical-framing",
       "href": "#leaf-workflow-canonical-framing"
+    },
+    {
+      "pillar": "workflow",
+      "text": "Self-hosted, versioned skills library for AI agents",
+      "links": [
+        {
+          "text": "kitze/skillbox",
+          "href": "https://github.com/kitze/skillbox"
+        }
+      ],
+      "id": "leaf-workflow-skillbox-self-hosted-versioned-skills-library-fo",
+      "href": "#leaf-workflow-skillbox-self-hosted-versioned-skills-library-fo"
     },
     {
       "pillar": "bulk",
