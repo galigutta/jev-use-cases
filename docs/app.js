@@ -96,10 +96,12 @@
     if (e.key === "Escape") closeAllBlurbs();
   });
 
-  // Propose → GitHub new issue (no secrets; query-encoded title/body)
+  // Propose → GitHub issue, then poll public API for a little on-page feedback
   const proposeForm = document.getElementById("propose-form");
   const proposeStatus = document.getElementById("propose-status");
   const ISSUES_NEW = "https://github.com/galigutta/jev-use-cases/issues/new";
+  const API_ISSUES =
+    "https://api.github.com/repos/galigutta/jev-use-cases/issues";
 
   const shortTitle = (text) => {
     const one = text.replace(/\s+/g, " ").trim();
@@ -122,11 +124,14 @@
     if (description.trim()) {
       parts.push("### Description", "", description.trim(), "");
     } else {
-      parts.push("### Description", "", "_Link-only proposal — resolve content from Source URL._", "");
+      parts.push(
+        "### Description",
+        "",
+        "_Link-only proposal — resolve content from Source URL._",
+        "",
+      );
     }
-    if (url) {
-      parts.push("### Source URL", "", url.trim(), "");
-    }
+    if (url) parts.push("### Source URL", "", url.trim(), "");
     parts.push(
       "---",
       "",
@@ -137,16 +142,176 @@
     return parts.join("\n");
   };
 
-  const showReady = (msgHtml) => {
-    if (!proposeStatus) return;
+  const ensureLive = () => {
+    if (!proposeStatus) return null;
     proposeStatus.classList.add("is-ready");
-    let ready = proposeStatus.querySelector(".propose__ready");
-    if (!ready) {
-      ready = document.createElement("p");
-      ready.className = "propose__ready";
-      proposeStatus.prepend(ready);
+    let live = proposeStatus.querySelector(".propose__live");
+    if (!live) {
+      live = document.createElement("div");
+      live.className = "propose__live";
+      live.setAttribute("role", "status");
+      live.setAttribute("aria-live", "polite");
+      proposeStatus.prepend(live);
     }
-    ready.innerHTML = msgHtml;
+    return live;
+  };
+
+  const setLive = (state, html) => {
+    const live = ensureLive();
+    if (!live) return;
+    live.dataset.state = state || "info";
+    live.innerHTML = html;
+  };
+
+  let pollTimer = null;
+  const stopPoll = () => {
+    if (pollTimer) {
+      clearInterval(pollTimer);
+      pollTimer = null;
+    }
+  };
+
+  const parseVerdict = (body) => {
+    if (!body) return null;
+    const lower = body.toLowerCase();
+    if (!lower.includes("jev novelty grade") && !lower.includes("**verdict:**")) {
+      return null;
+    }
+    const novel =
+      lower.includes("`novel`") ||
+      lower.includes("verdict:** `novel`") ||
+      (lower.includes("auto-merge") && lower.includes("clears"));
+    const dup =
+      lower.includes("`duplicate`") ||
+      lower.includes("does **not** clear") ||
+      lower.includes("already covered") ||
+      lower.includes("stopping — no pr");
+    let overlap = "";
+    const om = body.match(/\*\*Closest overlap:\*\*\s*`([^`]+)`(?:\s*—\s*(.+))?/i);
+    if (om) overlap = (om[2] || om[1] || "").trim();
+    let pillar = "";
+    const pm = body.match(/\*\*Pillar:\*\*\s*`([^`]+)`/i);
+    if (pm) pillar = pm[1];
+    if (dup && !novel) return { kind: "duplicate", overlap, pillar, body };
+    if (novel) return { kind: "novel", overlap, pillar, body };
+    return { kind: "unknown", overlap, pillar, body };
+  };
+
+  const findIssueByTitle = async (title, sinceMs) => {
+    const res = await fetch(
+      `${API_ISSUES}?state=all&labels=propose&sort=created&direction=desc&per_page=15`,
+      { headers: { Accept: "application/vnd.github+json" } },
+    );
+    if (!res.ok) throw new Error(`GitHub issues HTTP ${res.status}`);
+    const issues = await res.json();
+    const cutoff = Date.now() - sinceMs;
+    return (
+      issues.find((iss) => {
+        if (iss.title !== title) return false;
+        const created = Date.parse(iss.created_at || "") || 0;
+        return created >= cutoff;
+      }) || null
+    );
+  };
+
+  const fetchComments = async (issueNumber) => {
+    const res = await fetch(
+      `${API_ISSUES}/${issueNumber}/comments?per_page=30`,
+      { headers: { Accept: "application/vnd.github+json" } },
+    );
+    if (!res.ok) throw new Error(`GitHub comments HTTP ${res.status}`);
+    return res.json();
+  };
+
+  const startWatching = (title) => {
+    stopPoll();
+    const started = Date.now();
+    let issue = null;
+    let ticks = 0;
+
+    setLive(
+      "waiting",
+      `<strong>Finish creating the issue on GitHub</strong> if the tab is still open — then hang tight. Checking for a result…`,
+    );
+
+    const tick = async () => {
+      ticks += 1;
+      const elapsed = Date.now() - started;
+      try {
+        if (!issue) {
+          issue = await findIssueByTitle(title, 30 * 60 * 1000);
+          if (issue) {
+            setLive(
+              "waiting",
+              `Found your proposal <a href="${issue.html_url}" rel="noopener">#${issue.number}</a>. Waiting for the novelty check…`,
+            );
+          } else if (elapsed > 90_000) {
+            setLive(
+              "waiting",
+              `Still waiting for the GitHub issue titled <code>${title.replace(/</g, "&lt;")}</code>. Create it in the other tab if you haven’t yet.`,
+            );
+          }
+        }
+        if (issue) {
+          const comments = await fetchComments(issue.number);
+          for (const c of comments) {
+            const v = parseVerdict(c.body || "");
+            if (!v) continue;
+            stopPoll();
+            if (v.kind === "novel") {
+              setLive(
+                "ok",
+                `<strong>Accepted</strong> — it’s new` +
+                  (v.pillar ? ` (→ <em>${v.pillar}</em>)` : "") +
+                  `. A leaf is being written and <strong>auto-merged</strong> onto the map. ` +
+                  `<a href="${issue.html_url}" rel="noopener">See details</a>`,
+              );
+            } else if (v.kind === "duplicate") {
+              setLive(
+                "dup",
+                `<strong>Already on the map</strong> (or too close to an existing leaf)` +
+                  (v.overlap && v.overlap !== "none"
+                    ? `: <em>${v.overlap.replace(/</g, "&lt;")}</em>`
+                    : "") +
+                  `. Nothing was merged. ` +
+                  `<a href="${issue.html_url}" rel="noopener">See the grade</a>`,
+              );
+            } else {
+              setLive(
+                "info",
+                `Got an update on <a href="${issue.html_url}" rel="noopener">#${issue.number}</a> — open it for the full grade.`,
+              );
+            }
+            return;
+          }
+          if (elapsed > 45_000 && ticks % 3 === 0) {
+            setLive(
+              "waiting",
+              `Still grading <a href="${issue.html_url}" rel="noopener">#${issue.number}</a>… usually under a couple of minutes.`,
+            );
+          }
+        }
+        if (elapsed > 8 * 60_000) {
+          stopPoll();
+          setLive(
+            "info",
+            issue
+              ? `Taking longer than usual — check <a href="${issue.html_url}" rel="noopener">#${issue.number}</a> for the result.`
+              : `Couldn’t find the issue yet. Open <a href="https://github.com/galigutta/jev-use-cases/issues?q=label%3Apropose" rel="noopener">proposals</a> if you submitted it.`,
+          );
+        }
+      } catch (err) {
+        if (ticks === 1 || ticks % 5 === 0) {
+          setLive(
+            "info",
+            `Couldn’t reach GitHub just now (${String(err.message || err).slice(0, 80)}). Keep the issue tab open — the grade still lands there.`,
+          );
+        }
+      }
+    };
+
+    tick();
+    pollTimer = setInterval(tick, 5000);
   };
 
   proposeForm?.addEventListener("submit", (e) => {
@@ -156,7 +321,6 @@
     let description = (textEl?.value || "").trim();
     let url = (urlEl?.value || "").trim();
 
-    // Note field is a bare URL and link empty → treat as link
     if (!url && looksLikeUrl(description)) {
       url = description;
       description = "";
@@ -164,12 +328,12 @@
 
     if (!url && !description) {
       urlEl?.focus();
-      showReady("Paste a link (or a short note).");
+      setLive("info", "Paste a link (or a short note).");
       return;
     }
     if (url && !looksLikeUrl(url)) {
       urlEl?.focus();
-      showReady("Link must be a valid http(s) URL.");
+      setLive("info", "Link must be a valid http(s) URL.");
       return;
     }
 
@@ -179,13 +343,8 @@
     const params = new URLSearchParams({ title, body, labels: "propose" });
     const href = `${ISSUES_NEW}?${params.toString()}`;
 
-    showReady(
-      url
-        ? "Opening GitHub… we’ll fetch that link, grade it with Jev, and auto-merge if it’s new."
-        : "Opening GitHub… Jev will grade your note and auto-merge if it’s new."
-    );
-
     window.open(href, "_blank", "noopener");
+    startWatching(title);
   });
 
 })();
