@@ -1,5 +1,5 @@
 {
-  "count": 40,
+  "count": 41,
   "pillars": [
     "workflow",
     "bulk",
@@ -312,6 +312,18 @@
       ],
       "id": "leaf-realtime-typewriter-live-demo",
       "href": "#leaf-realtime-typewriter-live-demo"
+    },
+    {
+      "pillar": "realtime",
+      "text": "Conversation state sensor — live meeting analysis",
+      "links": [
+        {
+          "text": "@tsuyoshi_osiire",
+          "href": "https://x.com/tsuyoshi_osiire/status/2100734646824902713"
+        }
+      ],
+      "id": "leaf-realtime-conversation-state-sensor",
+      "href": "#leaf-realtime-conversation-state-sensor"
     },
     {
       "pillar": "verify",
