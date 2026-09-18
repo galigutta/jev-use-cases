@@ -1,0 +1,323 @@
+name: Propose use case
+
+on:
+  issues:
+    types: [opened, labeled]
+  repository_dispatch:
+    types: [propose_use_case]
+  workflow_dispatch:
+    inputs:
+      proposal:
+        description: Use-case proposal text
+        required: true
+        type: string
+      source_url:
+        description: Optional source URL
+        required: false
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+concurrency:
+  group: propose-use-case-${{ github.event.issue.number || github.run_id }}
+  cancel-in-progress: false
+
+jobs:
+  grade-and-pr:
+    name: Grade with Jev · Codex PR if novel
+    runs-on: ubuntu-latest
+    # Only run for propose-labeled / [propose] title / dispatch / workflow_dispatch
+    if: >
+      github.event_name == 'repository_dispatch' ||
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'issues' && (
+        contains(join(github.event.issue.labels.*.name, ','), 'propose') ||
+        startsWith(github.event.issue.title, '[propose]')
+      ))
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Resolve proposal inputs
+        id: input
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          ISSUE_BODY: ${{ github.event.issue.body }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_URL: ${{ github.event.issue.html_url }}
+          WD_PROPOSAL: ${{ github.event.inputs.proposal }}
+          WD_URL: ${{ github.event.inputs.source_url }}
+          RD_PROPOSAL: ${{ github.event.client_payload.proposal }}
+          RD_URL: ${{ github.event.client_payload.source_url }}
+        run: |
+          set -euo pipefail
+          python3 <<'PY'
+          import os, re, json
+          from pathlib import Path
+
+          event = os.environ.get("EVENT_NAME", "")
+          proposal = ""
+          source_url = ""
+          issue_number = ""
+          issue_url = ""
+
+          if event == "workflow_dispatch":
+              proposal = (os.environ.get("WD_PROPOSAL") or "").strip()
+              source_url = (os.environ.get("WD_URL") or "").strip()
+          elif event == "repository_dispatch":
+              proposal = (os.environ.get("RD_PROPOSAL") or "").strip()
+              source_url = (os.environ.get("RD_URL") or "").strip()
+          else:
+              issue_number = (os.environ.get("ISSUE_NUMBER") or "").strip()
+              issue_url = (os.environ.get("ISSUE_URL") or "").strip()
+              body = os.environ.get("ISSUE_BODY") or ""
+              title = os.environ.get("ISSUE_TITLE") or ""
+
+              # GitHub issue form fields look like:
+              # ### Description
+              # <text>
+              def section(name: str) -> str:
+                  m = re.search(
+                      rf"###\s*{re.escape(name)}\s*\n+([\s\S]*?)(?=\n###\s|\Z)",
+                      body,
+                      re.I,
+                  )
+                  return (m.group(1).strip() if m else "").strip()
+
+              proposal = section("Description")
+              source_url = section("Source URL")
+              # Drop placeholder / empty markers
+              if source_url in ("_No response_", "None", "n/a", "N/A"):
+                  source_url = ""
+              suggested = section("Suggested pillar")
+              if suggested.startswith("("):
+                  suggested = ""
+
+              if not proposal:
+                  # Fallback: whole body minus instructions, or title after [propose]
+                  proposal = re.sub(r"^\[propose\]\s*", "", title, flags=re.I).strip()
+                  if body.strip():
+                      proposal = (proposal + "\n\n" + body.strip()).strip() if proposal else body.strip()
+
+          Path("proposal.txt").write_text(proposal, encoding="utf-8")
+          Path("source_url.txt").write_text(source_url, encoding="utf-8")
+
+          # Expose to GITHUB_OUTPUT (multiline-safe)
+          def write_out(key: str, value: str) -> None:
+              out = os.environ["GITHUB_OUTPUT"]
+              with open(out, "a", encoding="utf-8") as f:
+                  if "\n" in value:
+                      f.write(f"{key}<<EOF\n{value}\nEOF\n")
+                  else:
+                      f.write(f"{key}={value}\n")
+
+          write_out("proposal", proposal)
+          write_out("source_url", source_url)
+          write_out("issue_number", issue_number)
+          write_out("issue_url", issue_url)
+          print(f"proposal_len={len(proposal)} source_url={bool(source_url)} issue={issue_number or '-'}")
+          if not proposal:
+              raise SystemExit("empty proposal")
+          PY
+
+      - name: Extract existing use cases
+        run: python3 scripts/extract_use_cases.py --out use_cases.json
+
+      - name: Grade novelty with Jev
+        id: grade
+        env:
+          TYPESAFE_API_KEY: ${{ secrets.TYPESAFE_API_KEY }}
+        run: |
+          set -euo pipefail
+          if [ -z "${TYPESAFE_API_KEY:-}" ]; then
+            echo "::error::TYPESAFE_API_KEY secret is not set"
+            exit 1
+          fi
+          PROPOSAL="$(cat proposal.txt)"
+          SOURCE_URL="$(cat source_url.txt)"
+          python3 scripts/grade_novelty.py \
+            --proposal "$PROPOSAL" \
+            --source-url "$SOURCE_URL" \
+            --inventory use_cases.json \
+            --out novelty.json
+          python3 <<'PY'
+          import json, os
+          from pathlib import Path
+          data = json.loads(Path("novelty.json").read_text(encoding="utf-8"))
+          answers = data.get("answers") or {}
+          pillar = (answers.get("pillar") or {}).get("choice") or "?"
+          noul = (answers.get("is_novel") or {}).get("noul")
+          verdict = data.get("verdict")
+          out = os.environ["GITHUB_OUTPUT"]
+          with open(out, "a", encoding="utf-8") as f:
+              f.write(f"verdict={verdict}\n")
+              f.write(f"novel={'true' if data.get('novel') else 'false'}\n")
+              f.write(f"pillar={pillar}\n")
+              f.write(f"noul={noul}\n")
+          print(f"verdict={verdict} pillar={pillar} noul={noul}")
+          PY
+
+      - name: Comment Jev verdict on issue
+        if: steps.input.outputs.issue_number != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python3 <<'PY' > /tmp/verdict-comment.md
+          import json
+          from pathlib import Path
+          data = json.loads(Path("novelty.json").read_text(encoding="utf-8"))
+          a = data.get("answers") or {}
+          noul = (a.get("is_novel") or {}).get("noul")
+          pillar = (a.get("pillar") or {}).get("choice")
+          pconf = (a.get("pillar") or {}).get("confidence")
+          score = (a.get("novelty_score") or {}).get("score")
+          overlap = a.get("overlap") or {}
+          novel = data.get("novel")
+          verdict = data.get("verdict")
+          thr = data.get("threshold")
+          lines = [
+              "## Jev novelty grade",
+              "",
+              f"- **Verdict:** `{verdict}`",
+              f"- **is_novel (noul):** `{noul}` (threshold ≥ `{thr}` → novel)",
+              f"- **Pillar:** `{pillar}`" + (f" (confidence `{pconf}`)" if pconf is not None else ""),
+              f"- **Novelty score:** `{score}`",
+              f"- **Closest overlap:** `{overlap.get('choice')}`" + (f" — {overlap.get('leaf_text')}" if overlap.get("leaf_text") else ""),
+              f"- **Model:** `{data.get('model')}`",
+              "",
+          ]
+          if novel:
+              lines.append("Proposal looks **novel**. Starting Codex to draft a PR leaf under the chosen pillar.")
+          else:
+              lines.append("Proposal looks like a **duplicate / already covered**. Stopping — no PR.")
+          print("\n".join(lines))
+          PY
+          gh issue comment "${{ steps.input.outputs.issue_number }}" --body-file /tmp/verdict-comment.md
+
+      - name: Stop if not novel
+        if: steps.grade.outputs.novel != 'true'
+        run: |
+          echo "Not novel — exiting successfully without PR."
+          exit 0
+
+      - name: Build Codex prompt
+        if: steps.grade.outputs.novel == 'true'
+        run: |
+          python3 scripts/build_codex_prompt.py \
+            --novelty novelty.json \
+            --out codex-prompt.md \
+            --issue-number "${{ steps.input.outputs.issue_number }}" \
+            --issue-url "${{ steps.input.outputs.issue_url }}"
+
+      - name: Create propose branch
+        if: steps.grade.outputs.novel == 'true'
+        id: branch
+        run: |
+          set -euo pipefail
+          ISSUE="${{ steps.input.outputs.issue_number }}"
+          if [ -n "$ISSUE" ]; then
+            BRANCH="propose/${ISSUE}"
+          else
+            BRANCH="propose/run-${{ github.run_id }}"
+          fi
+          git config user.email "galigutta@users.noreply.github.com"
+          git config user.name "galigutta"
+          git checkout -B "$BRANCH"
+          echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
+
+      - name: Run Codex
+        if: steps.grade.outputs.novel == 'true'
+        uses: openai/codex-action@v1
+        with:
+          openai-api-key: ${{ secrets.OPENAI_API_KEY }}
+          prompt-file: codex-prompt.md
+          permission-profile: ":workspace"
+          safety-strategy: drop-sudo
+
+      - name: Commit, push, open PR
+        if: steps.grade.outputs.novel == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCH: ${{ steps.branch.outputs.branch }}
+          ISSUE: ${{ steps.input.outputs.issue_number }}
+          PILLAR: ${{ steps.grade.outputs.pillar }}
+        run: |
+          set -euo pipefail
+          git config user.email "galigutta@users.noreply.github.com"
+          git config user.name "galigutta"
+
+          # Ignore ephemeral grading artifacts
+          git checkout -- use_cases.json novelty.json codex-prompt.md proposal.txt source_url.txt 2>/dev/null || true
+          rm -f use_cases.json novelty.json proposal.txt source_url.txt
+          # Keep codex-prompt.md out of the PR unless Codex somehow needs it — drop it
+          rm -f codex-prompt.md
+
+          if git diff --quiet && git diff --cached --quiet; then
+            # Also check untracked that matter
+            CHANGED="$(git status --porcelain docs/ || true)"
+            if [ -z "$CHANGED" ]; then
+              MSG="Codex made no file changes under docs/. No PR opened."
+              echo "$MSG"
+              if [ -n "${ISSUE}" ]; then
+                gh issue comment "$ISSUE" --body "$MSG"
+              fi
+              exit 0
+            fi
+          fi
+
+          git add docs/
+          if git diff --cached --quiet; then
+            MSG="No staged docs/ changes after Codex. No PR opened."
+            echo "$MSG"
+            if [ -n "${ISSUE}" ]; then
+              gh issue comment "$ISSUE" --body "$MSG"
+            fi
+            exit 0
+          fi
+
+          TITLE_PILLAR="${PILLAR:-use-case}"
+          if [ -n "${ISSUE}" ]; then
+            COMMIT_MSG="Add proposed use case leaf (${TITLE_PILLAR}) from #${ISSUE}"
+            PR_TITLE="Propose: add ${TITLE_PILLAR} leaf from #${ISSUE}"
+            PR_BODY="$(printf '%s\n' \
+              "## Summary" \
+              "- Adds one leaf under **${TITLE_PILLAR}** from proposal issue #${ISSUE}." \
+              "- Graded novel by Jev; leaf wording by Codex." \
+              "" \
+              "Closes #${ISSUE}" \
+            )"
+          else
+            COMMIT_MSG="Add proposed use case leaf (${TITLE_PILLAR})"
+            PR_TITLE="Propose: add ${TITLE_PILLAR} leaf"
+            PR_BODY="$(printf '%s\n' \
+              "## Summary" \
+              "- Adds one leaf under **${TITLE_PILLAR}** from a workflow_dispatch / repository_dispatch proposal." \
+              "- Graded novel by Jev; leaf wording by Codex." \
+            )"
+          fi
+
+          git commit -m "$COMMIT_MSG"
+          git push -u origin "HEAD:refs/heads/${BRANCH}" --force
+
+          PR_URL="$(gh pr create --base main --head "$BRANCH" --title "$PR_TITLE" --body "$PR_BODY" || true)"
+          if [ -z "$PR_URL" ]; then
+            # Maybe PR already exists
+            PR_URL="$(gh pr view "$BRANCH" --json url -q .url 2>/dev/null || true)"
+          fi
+          echo "PR_URL=${PR_URL}"
+          if [ -n "${ISSUE}" ] && [ -n "${PR_URL}" ]; then
+            gh issue comment "$ISSUE" --body "Codex opened a PR: ${PR_URL}"
+          fi
