@@ -25,11 +25,12 @@ from typing import Any
 API_URL = "https://api.typesafe.ai/v1/systemone"
 PILLARS = ("workflow", "bulk", "realtime", "verify", "harness", "voice")
 
-# High base thresholds; rise with catalog saturation.
-BASE_NOUL_THRESHOLD = 0.78
-BASE_SCORE_THRESHOLD = 2.7
-NOUL_SAT_SPAN = 0.14  # → ~0.92 at 200 leaves
-SCORE_SAT_SPAN = 0.8  # → ~3.5 at 200 leaves
+# Overlap-first rubric; thresholds only break gray-zone (weak overlap) cases.
+# Rise modestly with catalog saturation.
+BASE_NOUL_THRESHOLD = 0.70
+BASE_SCORE_THRESHOLD = 2.4
+NOUL_SAT_SPAN = 0.15  # → ~0.85 at 200 leaves
+SCORE_SAT_SPAN = 0.9  # → ~3.3 at 200 leaves
 SAT_START = 40
 SAT_RANGE = 160  # full sat at n=200
 
@@ -60,9 +61,11 @@ PILLAR_CRITERIA = {
 }
 
 STRICT_INSTRUCTIONS = (
-    "The use-case map saturates as it grows: prefer rejecting rephrases, "
-    "subsets, and 'same decision shape under a new noun.' "
-    "Mark is_novel yes only for a distinct decision job not already present."
+    "Overlap-first rubric: (1) If a listed leaf is a rephrase, subset, or the "
+    "same decision shape under a new noun, pick that leaf as overlap — do not "
+    "choose none. (2) Choose overlap=none ONLY when no listed leaf is a real "
+    "cousin; none means the proposal will be ADDED to the map. (3) is_novel / "
+    "novelty_score are secondary signals for gray-zone weak overlaps."
 )
 
 
@@ -486,20 +489,22 @@ def stage_novelty(
         "is_novel": {
             "type": "noul",
             "instructions": (
-                "Is this proposal a distinct decision job not already present? "
-                "Yes only for a new leaf — reject rephrases, subsets, and the same "
-                "decision shape under a new noun. The map saturates; prefer rejecting."
+                "Is this a distinct decision job vs the packed leaves? "
+                "Calibrate with overlap: if you pick a leaf as overlap, is_novel "
+                "should lean no; if you pick none, is_novel should lean yes "
+                "(none means we will add it)."
             ),
             "criteria": {
-                "true": "Distinct new decision job; not a rephrase/subset/same-shape variant",
-                "false": "Already covered, overlapping, subset, or only a wording/noun variant",
+                "true": "Distinct new decision job; safe to add as a new leaf",
+                "false": "Covered by a listed leaf (rephrase/subset/same decision shape)",
             },
         },
         "overlap": {
             "type": "choice",
             "instructions": (
-                "Which existing leaf in this packed state is most similar? "
-                "Choose none if no meaningful overlap."
+                "Which existing leaf is the closest cousin? "
+                "Pick a leaf for rephrases/subsets/same decision shape under a new noun. "
+                "Pick none ONLY if nothing listed is a real cousin — none will ADD this leaf."
             ),
             "criteria": overlap_criteria,
         },
@@ -634,20 +639,19 @@ def main() -> int:
         and overlap_conf >= OVERLAP_FORCE_DUP_CONF
     )
     overlap_ok = overlap_choice == "none" or overlap_conf < OVERLAP_FORCE_DUP_CONF
-    # If Jev finds no closest leaf, it is not "already on the map" — add it.
+    # Overlap-first decision:
+    # - none → always novel (add it)
+    # - high-confidence leaf overlap → always duplicate
+    # - weak/ambiguous overlap → thresholds break the tie
     no_closest = overlap_choice == "none"
-    clears_bar = (
-        noul >= noul_threshold
-        and novelty_score >= score_threshold
-        and overlap_ok
-        and not overlap_forces_dup
-    )
-    novel = no_closest or clears_bar
-    accepted_via = (
-        "no_closest_overlap"
-        if no_closest and not clears_bar
-        else ("clears_bar" if novel else None)
-    )
+    clears_bar = noul >= noul_threshold and novelty_score >= score_threshold
+    novel = no_closest or (not overlap_forces_dup and clears_bar)
+    if no_closest:
+        accepted_via = "no_closest_overlap" if not clears_bar else "clears_bar"
+    elif novel:
+        accepted_via = "clears_bar"
+    else:
+        accepted_via = None
     verdict = "novel" if novel else "duplicate"
 
     stages = {

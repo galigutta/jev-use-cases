@@ -26,10 +26,10 @@ const PILLAR_CRITERIA = {
   voice: "Voice / audio-path judgment",
 };
 
-const BASE_NOUL = 0.78;
-const BASE_SCORE = 2.7;
-const NOUL_SAT = 0.14;
-const SCORE_SAT = 0.8;
+const BASE_NOUL = 0.70;
+const BASE_SCORE = 2.4;
+const NOUL_SAT = 0.15;
+const SCORE_SAT = 0.9;
 const SAT_START = 40;
 const SAT_RANGE = 160;
 const OVERLAP_FORCE_DUP = 0.55;
@@ -347,7 +347,7 @@ async function grade(apiKey, note, sourceUrl, urlText, existing) {
     existing_in_pillar: peerList.map((p) => ({ id: p.id, text: p.text })),
     other_pillar_samples: others,
     instructions:
-      "The use-case map saturates as it grows: prefer rejecting rephrases, subsets, and 'same decision shape under a new noun.' Mark is_novel yes only for a distinct decision job not already present.",
+      "Overlap-first rubric: (1) If a listed leaf is a rephrase, subset, or the same decision shape under a new noun, pick that leaf as overlap — do not choose none. (2) Choose overlap=none ONLY when no listed leaf is a real cousin; none means the proposal will be ADDED to the map. (3) is_novel / novelty_score are secondary for gray-zone weak overlaps.",
   });
 
   let state = build(peers, otherSamples);
@@ -412,16 +412,16 @@ async function grade(apiKey, note, sourceUrl, urlText, existing) {
     is_novel: {
       type: "noul",
       instructions:
-        "Is this proposal a distinct decision job not already present? Yes only for a new leaf — reject rephrases, subsets, and the same decision shape under a new noun. The map saturates; prefer rejecting.",
+        "Is this a distinct decision job vs the packed leaves? Calibrate with overlap: if you pick a leaf as overlap, is_novel should lean no; if you pick none, is_novel should lean yes (none means we will add it).",
       criteria: {
-        true: "Distinct new decision job; not a rephrase/subset/same-shape variant",
-        false: "Already covered, overlapping, subset, or only a wording/noun variant",
+        true: "Distinct new decision job; safe to add as a new leaf",
+        false: "Covered by a listed leaf (rephrase/subset/same decision shape)",
       },
     },
     overlap: {
       type: "choice",
       instructions:
-        "Which existing leaf in this packed state is most similar? Choose none if no meaningful overlap.",
+        "Which existing leaf is the closest cousin? Pick a leaf for rephrases/subsets/same decision shape under a new noun. Pick none ONLY if nothing listed is a real cousin — none will ADD this leaf.",
       criteria: overlapCriteria,
     },
     novelty_score: {
@@ -463,23 +463,24 @@ async function grade(apiKey, note, sourceUrl, urlText, existing) {
     String(overlapChoice).startsWith("leaf_") &&
     overlapConf >= OVERLAP_FORCE_DUP;
   const overlapOk = overlapChoice === "none" || overlapConf < OVERLAP_FORCE_DUP;
-  // If Jev finds no closest leaf, it is not "already on the map" — add it.
+  // Overlap-first: none → add; high-conf leaf → reject; weak overlap → thresholds.
   const noClosest = overlapChoice === "none";
-  const clearsBar =
-    noul >= noulThr && noveltyScore >= scoreThr && overlapOk && !overlapForcesDup;
-  const novel = noClosest || clearsBar;
-  const acceptedVia = noClosest && !clearsBar ? "no_closest_overlap" : novel ? "clears_bar" : null;
+  const clearsBar = noul >= noulThr && noveltyScore >= scoreThr;
+  const novel = noClosest || (!overlapForcesDup && clearsBar);
+  let acceptedVia = null;
+  if (noClosest) acceptedVia = clearsBar ? "clears_bar" : "no_closest_overlap";
+  else if (novel) acceptedVia = "clears_bar";
 
   const gates = {
     noul_pass: noClosest || noul >= noulThr,
     score_pass: noClosest || noveltyScore >= scoreThr,
-    overlap_ok: overlapOk && !overlapForcesDup,
+    overlap_ok: !overlapForcesDup,
   };
   const why = [];
   if (!novel) {
+    if (overlapForcesDup) why.push("overlap_force_duplicate");
     if (!(noul >= noulThr)) why.push("noul_below_threshold");
     if (!(noveltyScore >= scoreThr)) why.push("score_below_threshold");
-    if (overlapForcesDup || !overlapOk) why.push("overlap_force_duplicate");
   }
 
   return {
