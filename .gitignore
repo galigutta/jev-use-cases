@@ -1,0 +1,8 @@
+
+__pycache__/
+*.pyc
+use_cases.json
+novelty.json
+codex-prompt.md
+proposal.txt
+source_url.txt

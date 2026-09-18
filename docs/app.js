@@ -95,4 +95,90 @@
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") closeAllBlurbs();
   });
+
+  // Propose → GitHub new issue (no secrets; query-encoded title/body)
+  const proposeForm = document.getElementById("propose-form");
+  const proposeStatus = document.getElementById("propose-status");
+  const ISSUES_NEW = "https://github.com/galigutta/jev-use-cases/issues/new";
+
+  const shortTitle = (text) => {
+    const one = text.replace(/\s+/g, " ").trim();
+    if (!one) return "use case";
+    const cut = one.length > 72 ? one.slice(0, 69).replace(/\s+\S*$/, "") + "…" : one;
+    return cut;
+  };
+
+  const buildIssueBody = (description, url) => {
+    const parts = [
+      "### Description",
+      "",
+      description.trim(),
+      "",
+    ];
+    if (url) {
+      parts.push("### Source URL", "", url.trim(), "");
+    }
+    parts.push(
+      "---",
+      "",
+      "_Submitted from the [Jev use-case map](https://galigutta.github.io/jev-use-cases/#propose)._",
+      "",
+      "**Label:** please add `propose` if it was not auto-applied so the Action can grade with Jev and (if novel) open a Codex PR.",
+      "",
+      "Pipeline: Jev novelty grade → if novel, Codex PR editing `docs/index.html`.",
+    );
+    return parts.join("\n");
+  };
+
+  proposeForm?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const textEl = document.getElementById("propose-text");
+    const urlEl = document.getElementById("propose-url");
+    const description = (textEl?.value || "").trim();
+    const url = (urlEl?.value || "").trim();
+    if (!description) {
+      textEl?.focus();
+      return;
+    }
+    if (url) {
+      try {
+        // Validate absolute http(s) URL when provided
+        const u = new URL(url);
+        if (!/^https?:$/i.test(u.protocol)) throw new Error("bad protocol");
+      } catch {
+        urlEl?.focus();
+        if (proposeStatus) {
+          proposeStatus.classList.add("is-ready");
+          let ready = proposeStatus.querySelector(".propose__ready");
+          if (!ready) {
+            ready = document.createElement("p");
+            ready.className = "propose__ready";
+            proposeStatus.prepend(ready);
+          }
+          ready.textContent = "Source URL must be a valid http(s) link (or leave it blank).";
+        }
+        return;
+      }
+    }
+
+    const title = `[propose] ${shortTitle(description)}`;
+    const body = buildIssueBody(description, url);
+    const params = new URLSearchParams({ title, body, labels: "propose" });
+    const href = `${ISSUES_NEW}?${params.toString()}`;
+
+    if (proposeStatus) {
+      proposeStatus.classList.add("is-ready");
+      let ready = proposeStatus.querySelector(".propose__ready");
+      if (!ready) {
+        ready = document.createElement("p");
+        ready.className = "propose__ready";
+        proposeStatus.prepend(ready);
+      }
+      ready.innerHTML =
+        "Opening GitHub with your proposal. After the issue is created, the Action will grade with Jev; if novel, Codex opens a PR. Track progress on <a href=\"https://github.com/galigutta/jev-use-cases/actions\" rel=\"noopener\">Actions</a>.";
+    }
+
+    window.open(href, "_blank", "noopener");
+  });
+
 })();

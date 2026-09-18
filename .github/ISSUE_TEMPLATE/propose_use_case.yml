@@ -1,0 +1,37 @@
+name: Propose use case
+description: Suggest a new Jev use-case leaf for the MECE map. A GitHub Action grades novelty with Jev; if novel, Codex opens a PR.
+title: "[propose] "
+labels: ["propose"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Paste a short description of the use case. Optional source URL helps the grader.
+        Flow: **Jev grades novelty** → if novel, **Codex opens a PR** editing `docs/index.html`.
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What is the use case? Include handles, repos, or demo links if you have them.
+      placeholder: e.g. Jev picks the next Kubernetes remediation action from cluster events at ~2 Hz…
+    validations:
+      required: true
+  - type: input
+    id: source_url
+    attributes:
+      label: Source URL
+      description: Optional link to a tweet, repo, demo, or write-up.
+      placeholder: https://…
+  - type: dropdown
+    id: suggested_pillar
+    attributes:
+      label: Suggested pillar
+      description: Optional hint — Jev still chooses the pillar.
+      options:
+        - (let Jev decide)
+        - workflow
+        - bulk
+        - realtime
+        - verify
+        - harness
+        - voice
